@@ -43,5 +43,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.material.v170)
 }
