@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.databinding.ActivityMainBinding;
 import com.albsig.stundenmanager.login.LoginFragment;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initLogin() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, LoginFragment.class, null, null)
+                .add(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
                 .setReorderingAllowed(true);
         fragmentTransaction.commit();
     }

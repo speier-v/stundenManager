@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.login;
+package com.albsig.stundenmanager.dashboard;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,15 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.albsig.stundenmanager.R;
-import com.albsig.stundenmanager.common.Constants;
-import com.albsig.stundenmanager.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
 
-public class LoginFragment extends Fragment {
+public class DashboardFragment extends Fragment {
 
-
-    @Nullable private FragmentLoginBinding binding;
+    @Nullable
+    private FragmentDashboardBinding binding;
     private FragmentTransaction fragmentTransaction;
 
     @Override
@@ -37,7 +35,7 @@ public class LoginFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false );
+        binding = FragmentDashboardBinding.inflate(inflater, container, false );
         return binding.getRoot();
     }
 
@@ -51,15 +49,5 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        assert binding != null;
-        binding.btnLogin.setOnClickListener(v -> goToDashboard());
-    }
-
-    private void goToDashboard() {
-        DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
-
-        fragmentTransaction.commit();
     }
 }
