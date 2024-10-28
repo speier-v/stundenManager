@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.albsig.stundenmanager.databinding.ActivityMainBinding;
+import com.albsig.stundenmanager.login.LoginFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textview.MaterialTextView;
@@ -31,9 +33,16 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        test();
+        initLogin();
     }
 
+    private void initLogin() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, LoginFragment.class, null, null)
+                .setReorderingAllowed(true);
+        fragmentTransaction.commit();
+    }
+/*
     private void test() {
         MaterialTextView tv = binding.hello;
 
@@ -62,5 +71,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
+*/
 }
