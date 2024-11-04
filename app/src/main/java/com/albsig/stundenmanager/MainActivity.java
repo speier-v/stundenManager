@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.albsig.stundenmanager.common.Constants;
+import com.albsig.stundenmanager.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.ActivityMainBinding;
 import com.albsig.stundenmanager.login.LoginFragment;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,9 +26,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoginFragment.LoginListener {
 
     ActivityMainBinding binding;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,24 @@ public class MainActivity extends AppCompatActivity {
                 .setReorderingAllowed(true);
         fragmentTransaction.commit();
     }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onLoginSuccess(String userId) {
+        this.userId = userId;
+
+        DashboardFragment dashboardFragment = new DashboardFragment();
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        dashboardFragment.setArguments(args);
+        loadFragment(dashboardFragment);
+    }
+
 /*
     private void test() {
         MaterialTextView tv = binding.hello;

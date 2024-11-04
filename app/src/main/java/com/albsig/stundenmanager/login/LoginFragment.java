@@ -21,11 +21,25 @@ public class LoginFragment extends Fragment {
 
     @Nullable private FragmentLoginBinding binding;
     private FragmentTransaction fragmentTransaction;
+    private LoginListener loginListener;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        if (context instanceof LoginListener) {
+            loginListener = (LoginListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement LoginListener");
+        }
+    }
 
+    private void onLoginButtonClicked() {
+        String userId = "userId"; // TODO replace with actual userId from firestore
+        loginListener.onLoginSuccess(userId);
+    }
+
+    public interface LoginListener {
+        void onLoginSuccess(String userId);
     }
 
     @Override
@@ -52,7 +66,7 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         assert binding != null;
-        binding.btnLogin.setOnClickListener(v -> goToDashboard());
+        binding.btnLogin.setOnClickListener(v -> onLoginButtonClicked());
     }
 
     private void goToDashboard() {

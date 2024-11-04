@@ -4,30 +4,17 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_hello"
-        android:textSize="48dp"
-        android:text="Hallo"
-        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSessions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="@id/gl_start"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
-        android:layout_marginTop="32dp"
-        />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_user_name"
-        android:textSize="44dp"
-        android:text="Robert 🙂 !"
-        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        app:layout_constraintStart_toStartOf="@id/gl_start"
-        app:layout_constraintEnd_toEndOf="@id/gl_end"
-        app:layout_constraintTop_toBottomOf="@id/tv_hello"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingHorizontal="30dp"
+        android:paddingTop="20dp"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
@@ -44,6 +31,17 @@
         app:layout_constraintGuide_end="16dp"
         android:orientation="vertical"
         />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddSession"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Add New Session"
+        android:src="@drawable/plus_sign"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/cardview_light_background"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
