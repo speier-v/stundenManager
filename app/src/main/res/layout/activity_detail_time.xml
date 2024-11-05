@@ -19,13 +19,6 @@
         android:text="End Time: Not set"
         android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/breaksTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Breaks: No breaks recorded"
-        android:textSize="18sp" />
-
     <Button
         android:id="@+id/addEndTimeButton"
         android:layout_width="wrap_content"

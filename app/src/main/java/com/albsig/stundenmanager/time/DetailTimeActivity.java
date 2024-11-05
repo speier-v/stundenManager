@@ -41,7 +41,6 @@ public class DetailTimeActivity extends AppCompatActivity implements BreakAdapte
 
     private TextView startTimeTextView;
     private TextView endTimeTextView;
-    private TextView breaksTextView;
     private Button addEndTimeButton;
     private Button addBreakButton;
     private RecyclerView breaksRecyclerView;
@@ -67,7 +66,6 @@ public class DetailTimeActivity extends AppCompatActivity implements BreakAdapte
 
         startTimeTextView = findViewById(R.id.startTimeTextView);
         endTimeTextView = findViewById(R.id.endTimeTextView);
-        breaksTextView = findViewById(R.id.breaksTextView);
         addEndTimeButton = findViewById(R.id.addEndTimeButton);
         addBreakButton = findViewById(R.id.addBreakButton);
         breaksRecyclerView = findViewById(R.id.breaksRecyclerView);
