@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,15 +22,20 @@ import java.util.Map;
 
 public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHolder> {
 
-    private List<Map<String, Timestamp>> breaks = new ArrayList<>();
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    public interface OnBreakDeletedListener {
+        void onBreakDeleted();
+    }
 
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private List<Map<String, Timestamp>> breaks = new ArrayList<>();
     private String userId;
     private String sessionId;
+    private OnBreakDeletedListener onBreakDeletedListener;
 
-    public BreakAdapter(String userId, String sessionId) {
+    public BreakAdapter(String userId, String sessionId, OnBreakDeletedListener onBreakDeletedListener) {
         this.userId = userId;
         this.sessionId = sessionId;
+        this.onBreakDeletedListener = onBreakDeletedListener;
     }
 
     @NonNull
@@ -39,12 +45,13 @@ public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHol
         return new BreakViewHolder(view);
     }
 
+    /*
     @Override
     public void onBindViewHolder(@NonNull BreakViewHolder holder, int position) {
         Map<String, Timestamp> breakEntry = breaks.get(position);
 
-        Timestamp breakStart = breakEntry.get("startBreak");
-        Timestamp breakEnd = breakEntry.get("endBreak");
+        Timestamp breakStart = breakEntry.get("breakStart");
+        Timestamp breakEnd = breakEntry.get("breakEnd");
 
         holder.breakStartTextView.setText(breakStart != null ? timeFormat.format(breakStart.toDate()) : "Not set");
         holder.breakEndTextView.setText(breakEnd != null ? timeFormat.format(breakEnd.toDate()) : "Not set");
@@ -52,6 +59,34 @@ public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHol
         holder.deleteBreakButton.setOnClickListener(v -> {
             FirestoreUtil.deleteBreak(userId, sessionId, holder.getAdapterPosition());
             notifyItemRemoved(position);
+            onBreakDeletedListener.onBreakDeleted();
+        });
+    }
+    */
+    @Override
+    public void onBindViewHolder(@NonNull BreakViewHolder holder, int position) {
+        Map<String, Timestamp> breakEntry = breaks.get(position);
+
+        Timestamp breakStart = breakEntry.get("breakStart");
+        Timestamp breakEnd = breakEntry.get("breakEnd");
+
+        holder.breakStartTextView.setText(breakStart != null ? timeFormat.format(breakStart.toDate()) : "Not set");
+        holder.breakEndTextView.setText(breakEnd != null ? timeFormat.format(breakEnd.toDate()) : "Not set");
+
+        holder.deleteBreakButton.setOnClickListener(v -> {
+            FirestoreUtil.deleteBreak(userId, sessionId, position, new FirestoreUtil.OnDeleteBreakListener() {
+                @Override
+                public void onSuccess() {
+                    if (onBreakDeletedListener != null) {
+                        onBreakDeletedListener.onBreakDeleted();
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(holder.itemView.getContext(), "Failed to delete break", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

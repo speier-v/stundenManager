@@ -125,7 +125,7 @@ public class FirestoreUtil {
                 .addOnFailureListener(e -> Log.w(TAG, "Error deleting work session", e));
     }
 
-    public static void deleteBreak(String userId, String sessionId, int breakIndex) {
+    public static void deleteBreak(String userId, String sessionId, int breakIndex, OnDeleteBreakListener listener) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         firestore.collection("users")
@@ -143,10 +143,19 @@ public class FirestoreUtil {
                                 .collection("sessions")
                                 .document(sessionId)
                                 .update("breaks", breaks)
-                                .addOnSuccessListener(aVoid -> Log.d("FirestoreUtil", "Break removed successfully"))
-                                .addOnFailureListener(e -> Log.e("FirestoreUtil", "Error removing break", e));
+                                .addOnSuccessListener(aVoid -> {
+                                    if (listener != null) listener.onSuccess();
+                                })
+                                .addOnFailureListener(e -> {
+                                    if (listener != null) listener.onFailure(e);
+                                });
                     }
                 });
+    }
+
+    public interface OnDeleteBreakListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 
     public interface FirestoreCallback {

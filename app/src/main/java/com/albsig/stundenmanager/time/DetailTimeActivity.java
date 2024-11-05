@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class DetailTimeActivity extends AppCompatActivity {
+public class DetailTimeActivity extends AppCompatActivity implements BreakAdapter.OnBreakDeletedListener {
 
     private String userId;
     private String sessionId;
@@ -48,6 +48,17 @@ public class DetailTimeActivity extends AppCompatActivity {
     private BreakAdapter breakAdapter;
 
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
+    private Timestamp selectedBreakStartTime;
+    public enum TimestampTarget {
+        END_SESSION,
+        BREAK_START,
+        BREAK_END
+    }
+
+    @Override
+    public void onBreakDeleted() {
+        loadSessionDetails();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,17 +78,17 @@ public class DetailTimeActivity extends AppCompatActivity {
         db = firestoreUtil.getInstance();
 
         breaksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        breakAdapter = new BreakAdapter(userId, sessionId);
+        breakAdapter = new BreakAdapter(userId, sessionId, this);
         breaksRecyclerView.setAdapter(breakAdapter);
 
         loadSessionDetails();
 
         addEndTimeButton.setOnClickListener(v -> {
-            showDatePicker();
+            showDatePicker(TimestampTarget.END_SESSION);
         });
 
         addBreakButton.setOnClickListener(v -> {
-            // TODO
+            showDatePicker(TimestampTarget.BREAK_START);
         });
     }
 
@@ -94,7 +105,6 @@ public class DetailTimeActivity extends AppCompatActivity {
                         Timestamp endTime = document.getTimestamp("endTime");
                         List<Map<String, Timestamp>> breaks = (List<Map<String, Timestamp>>) document.get("breaks");
 
-                        // Set startTime
                         if (startTime != null) {
                             String formattedStartTime = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(startTime.toDate());
                             startTimeTextView.setText(formattedStartTime);
@@ -102,7 +112,6 @@ public class DetailTimeActivity extends AppCompatActivity {
                             startTimeTextView.setText("Not set");
                         }
 
-                        // Set endTime
                         if (endTime != null) {
                             String formattedEndTime = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(endTime.toDate());
                             endTimeTextView.setText(formattedEndTime);
@@ -112,34 +121,14 @@ public class DetailTimeActivity extends AppCompatActivity {
                             addEndTimeButton.setVisibility(View.VISIBLE);
                         }
 
-                        /*
-                        StringBuilder breaksDisplay = new StringBuilder();
-                        if (breaks != null && !breaks.isEmpty()) {
-                            for (int i = 0; i < breaks.size(); i++) {
-                                Map<String, Timestamp> breakEntry = breaks.get(i);
-                                Timestamp breakStart = breakEntry.get("startBreak");
-                                Timestamp breakEnd = breakEntry.get("endBreak");
-
-                                String formattedBreakStart = breakStart != null ? new SimpleDateFormat("HH:mm", Locale.getDefault()).format(breakStart.toDate()) : "Not set";
-                                String formattedBreakEnd = breakEnd != null ? new SimpleDateFormat("HH:mm", Locale.getDefault()).format(breakEnd.toDate()) : "Not set";
-
-                                breaksDisplay.append("Break ").append(i + 1).append(": ")
-                                        .append(formattedBreakStart).append(" - ").append(formattedBreakEnd).append("\n");
-                            }
-                        } else {
-                            breaksDisplay.append("No breaks recorded");
-                        }
-                        breaksTextView.setText(breaksDisplay.toString().trim());
-                         */
                         breakAdapter.setBreaks(breaks);
-
                     } else {
                         Toast.makeText(this, "Failed to load session details", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void showDatePicker() {
+    private void showDatePicker(TimestampTarget target) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -150,13 +139,13 @@ public class DetailTimeActivity extends AppCompatActivity {
                     selectedYear = yearSelected;
                     selectedMonth = monthSelected;
                     selectedDay = daySelected;
-                    showTimePicker();
+                    showTimePicker(target);
                 }, year, month, day);
 
         datePickerDialog.show();
     }
 
-    private void showTimePicker() {
+    private void showTimePicker(TimestampTarget target) {
         final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -166,9 +155,9 @@ public class DetailTimeActivity extends AppCompatActivity {
                     selectedHour = hourOfDay;
                     selectedMinute = minuteSelected;
 
-                    Timestamp customEndTime = createCustomTimestamp(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute);
+                    Timestamp customTimestamp = createCustomTimestamp(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute);
 
-                    endSession(customEndTime);
+                    handleTimestampSelection(target, customTimestamp);
                 }, hour, minute, true);
 
         timePickerDialog.show();
@@ -186,8 +175,28 @@ public class DetailTimeActivity extends AppCompatActivity {
         return new Timestamp(calendar.getTime());
     }
 
+    private void handleTimestampSelection(TimestampTarget target, Timestamp timestamp) {
+        switch (target) {
+            case END_SESSION:
+                endSession(timestamp);
+                break;
+            case BREAK_START:
+                selectedBreakStartTime = timestamp;
+                showDatePicker(TimestampTarget.BREAK_END);
+                break;
+            case BREAK_END:
+                addBreak(selectedBreakStartTime, timestamp);
+                break;
+        }
+    }
+
     private void endSession(Timestamp customEndTime) {
         firestoreUtil.endWorkSession(userId, sessionId, customEndTime);
+        loadSessionDetails();
+    }
+
+    private void addBreak(Timestamp startBreak, Timestamp endBreak) {
+        firestoreUtil.addBreakToSession(userId, sessionId, startBreak, endBreak);
         loadSessionDetails();
     }
 }
