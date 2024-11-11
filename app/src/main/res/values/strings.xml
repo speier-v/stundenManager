@@ -3,4 +3,13 @@
     <string name="password">password</string>
     <string name="email">email</string>
     <string name="login">login</string>
+    <string name="birthday">birthday\n</string>
+    <string name="street">street</string>
+    <string name="zip_code">zipcode</string>
+    <string name="city">city</string>
+    <string name="registration">registration</string>
+    <string name="or_login">or login</string>
+    <string name="surname">surname</string>
+    <string name="name">name</string>
+    <string name="or_registration">or registration</string>
 </resources>
