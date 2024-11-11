@@ -43,5 +43,15 @@
         android:layout_margin="16dp"
         app:backgroundTint="@color/cardview_light_background"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSignOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/sign_out"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/cardview_light_background"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

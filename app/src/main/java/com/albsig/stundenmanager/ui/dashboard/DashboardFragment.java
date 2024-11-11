@@ -1,9 +1,8 @@
-package com.albsig.stundenmanager.dashboard;
+package com.albsig.stundenmanager.ui.dashboard;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +13,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.albsig.stundenmanager.R;
+import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
 import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
+import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -32,7 +36,8 @@ import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
-    @Nullable
+
+    private Context mContext;
     private FragmentDashboardBinding binding;
     private SessionsAdapter sessionsAdapter;
     private FirebaseFirestore db;
@@ -44,6 +49,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        mContext = context;
         firestoreUtil = new FirestoreUtil();
         db = firestoreUtil.getInstance();
     }
@@ -71,6 +77,7 @@ public class DashboardFragment extends Fragment {
 
         setupRecyclerView();
         loadSessionDates();
+        signOut();
         return binding.getRoot();
     }
 
@@ -173,6 +180,19 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(binding.getRoot().getContext(), "A work session for this day already exists.", Toast.LENGTH_LONG).show();
                 Log.w(TAG, "Error starting session", e);
             }
+        });
+    }
+
+    private void signOut() {
+        FloatingActionButton fabSignOut = binding.fabSignOut;
+
+        fabSignOut.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Toast.makeText(this.binding.getRoot().getContext(), "Signed out successfully", Toast.LENGTH_SHORT).show();
+            FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
+                    .setReorderingAllowed(true);
+            fragmentTransaction.commit();
         });
     }
 }

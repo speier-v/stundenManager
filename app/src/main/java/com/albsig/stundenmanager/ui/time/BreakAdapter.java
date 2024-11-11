@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.time;
+package com.albsig.stundenmanager.ui.time;
 
 import android.view.LayoutInflater;
 import android.view.View;

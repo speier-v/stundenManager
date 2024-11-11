@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.dashboard;
+package com.albsig.stundenmanager.ui.dashboard;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
-import com.albsig.stundenmanager.time.DetailTimeActivity;
+import com.albsig.stundenmanager.ui.time.DetailTimeActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;

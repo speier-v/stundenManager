@@ -1,30 +1,16 @@
 package com.albsig.stundenmanager;
 
 import android.os.Bundle;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.albsig.stundenmanager.common.Constants;
-import com.albsig.stundenmanager.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.ActivityMainBinding;
-import com.albsig.stundenmanager.login.LoginFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.List;
+import com.albsig.stundenmanager.ui.login.LoginFragment;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.LoginListener {
 
