@@ -18,6 +18,7 @@ import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
+import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
@@ -122,6 +123,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         assert binding != null;
         binding.btnLogin.setOnClickListener(v -> onLoginButtonClicked());
+        binding.btnGoToRegistration.setOnClickListener(v -> goToRegistration());
     }
 
     private void updateUI(@Nullable FirebaseUser user) {
@@ -133,6 +135,14 @@ public class LoginFragment extends Fragment {
         fragmentTransaction = getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
 
+        fragmentTransaction.commit();
+    }
+
+    private void goToRegistration() {
+        RegistrationFragment newRegistrationFragment = new RegistrationFragment();
+
+        fragmentTransaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
         fragmentTransaction.commit();
     }
 }

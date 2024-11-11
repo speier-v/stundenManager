@@ -214,6 +214,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginHorizontal="64dp"
             android:text="@string/registration"
+            android:textAllCaps="true"
             />
 
         <com.google.android.material.button.MaterialButton
