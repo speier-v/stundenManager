@@ -53,4 +53,5 @@ dependencies {
     implementation(libs.material.v170)
     implementation(platform(libs.firebase.bom.v3351))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.functions)
 }

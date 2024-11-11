@@ -2,6 +2,7 @@
 agp = "8.6.0"
 firebaseBom = "33.4.0"
 firebaseBomVersion = "33.5.1"
+firebaseFunctions = "21.0.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -19,6 +20,7 @@ navigationUi = "2.8.3"
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-bom-v3351 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-functions = { module = "com.google.firebase:firebase-functions", version.ref = "firebaseFunctions" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
