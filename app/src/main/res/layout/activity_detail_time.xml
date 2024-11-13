@@ -1,42 +1,93 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:id="@+id/startTimeTextViewTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/start_time"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:id="@+id/startTimeTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Start Time: Not set"
-        android:textSize="18sp" />
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/startTimeTextViewTitle"
+        android:text="@string/start_time_not_set"
+        android:layout_marginTop="4dp"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:id="@+id/endTimeTextViewTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/startTimeTextView"
+        android:text="@string/end_time"
+        android:layout_marginTop="8dp"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:id="@+id/endTimeTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="End Time: Not set"
-        android:textSize="18sp" />
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/endTimeTextViewTitle"
+        android:text="@string/end_time_not_set"
+        android:layout_marginTop="4dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addEndTimeButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Add End Time"
-        android:visibility="gone" />
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/endTimeTextView"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:text="@string/add_end_time"
+        android:layout_marginTop="24dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addBreakButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Add Break"
-        />
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/addEndTimeButton"
+        android:text="@string/add_break"
+        android:layout_marginTop="12dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:id="@+id/breaksRecyclerView"
-        />
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/addBreakButton"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="12dp"/>
 
-</LinearLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_start"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_end"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,13 +18,13 @@
         android:textSize="16sp" />
 
     <com.google.android.material.button.MaterialButton
-        style="@style/Widget.AppCompat.ButtonBar.AlertDialog"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
         android:id="@+id/deleteButton"
         android:layout_width="0dp"
+        app:icon="@drawable/ic_close"
         android:layout_height="wrap_content"
-        android:text="@string/delete"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
