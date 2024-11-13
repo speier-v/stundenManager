@@ -8,4 +8,5 @@ import com.albsig.stundenmanager.domain.model.UserModel;
 public class UserViewModel extends ViewModel {
 
     private MutableLiveData<UserModel> userModelResult = new MutableLiveData<>();
+
 }
