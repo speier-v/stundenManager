@@ -12,4 +12,7 @@
     <string name="surname">surname</string>
     <string name="name">name</string>
     <string name="or_registration">or registration</string>
+    <string name="add_new_session">Add new session</string>
+    <string name="sign_out">sign-out</string>
+    <string name="delete">Delete</string>
 </resources>
