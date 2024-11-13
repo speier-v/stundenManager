@@ -6,11 +6,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,11 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 public class FirestoreUtil {
+
     private static final String TAG = "FirestoreUtil";
     private final FirebaseFirestore db;
-
-    private static final String USERS_COLLECTION = "users";
-    private static final String SESSIONS_COLLECTION = "sessions";
 
     public FirestoreUtil() {
         this.db = FirebaseFirestore.getInstance();
@@ -38,13 +38,13 @@ public class FirestoreUtil {
         user.put("name", name);
         user.put("email", email);
 
-        db.collection(USERS_COLLECTION).document(userId).set(user)
+        db.collection(Constants.USERS_COLLECTION).document(userId).set(user)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "User added with ID: " + userId))
                 .addOnFailureListener(e -> Log.w(TAG, "Error adding user", e));
     }
 
     public void startWorkSession(String userId, Timestamp customStartTime, FirestoreCallback callback) {
-        CollectionReference workSessionsRef = db.collection(USERS_COLLECTION).document(userId).collection(SESSIONS_COLLECTION);
+        CollectionReference workSessionsRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.SESSIONS_COLLECTION);
 
         Timestamp dayStart = getDayStartTimestamp(customStartTime);
         Timestamp dayEnd = getDayEndTimestamp(customStartTime);
@@ -83,7 +83,7 @@ public class FirestoreUtil {
     }
 
     public void endWorkSession(String userId, String sessionId, Timestamp timestamp) {
-        DocumentReference sessionRef = db.collection(USERS_COLLECTION).document(userId).collection(SESSIONS_COLLECTION).document(sessionId);
+        DocumentReference sessionRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.SESSIONS_COLLECTION).document(sessionId);
 
         sessionRef.update("endTime", timestamp)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Work session ended with ID: " + sessionId))
@@ -91,7 +91,7 @@ public class FirestoreUtil {
     }
 
     public void addBreakToSession(String userId, String sessionId, Timestamp breakStart, Timestamp breakEnd) {
-        DocumentReference sessionRef = db.collection(USERS_COLLECTION).document(userId).collection(SESSIONS_COLLECTION).document(sessionId);
+        DocumentReference sessionRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.SESSIONS_COLLECTION).document(sessionId);
 
         Map<String, Timestamp> newBreak = new HashMap<>();
         newBreak.put("breakStart", breakStart);
@@ -103,7 +103,7 @@ public class FirestoreUtil {
     }
 
     public void getAllSessions(String userId, FirestoreCallback callback) {
-        CollectionReference sessionsRef = db.collection(USERS_COLLECTION).document(userId).collection(SESSIONS_COLLECTION);
+        CollectionReference sessionsRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.SESSIONS_COLLECTION);
 
         sessionsRef.get()
                 .addOnCompleteListener(task -> {
@@ -118,7 +118,7 @@ public class FirestoreUtil {
     }
 
     public void deleteWorkSession(String userId, String sessionId) {
-        DocumentReference sessionRef = db.collection(USERS_COLLECTION).document(userId).collection(SESSIONS_COLLECTION).document(sessionId);
+        DocumentReference sessionRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.SESSIONS_COLLECTION).document(sessionId);
 
         sessionRef.delete()
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Work session deleted with ID: " + sessionId))

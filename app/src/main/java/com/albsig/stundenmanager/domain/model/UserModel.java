@@ -1,5 +1,8 @@
 package com.albsig.stundenmanager.domain.model;
 
+import com.albsig.stundenmanager.common.Constants;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 public class UserModel {
     private String uid;
     private String email;
@@ -21,6 +24,17 @@ public class UserModel {
         this.street = street;
         this.zipCode = zipCode;
         this.city = city;
+    }
+
+    public UserModel(String uid, String email, DocumentSnapshot documentSnapshot) {
+        this.uid = uid;
+        this.email = email;
+        this.name = documentSnapshot.getString(Constants.USER_MODEL_NAME);
+        this.surname = documentSnapshot.getString(Constants.USER_MODEL_SURNAME);
+        this.date = documentSnapshot.getString(Constants.USER_MODEL_BIRTHDAY);
+        this.street = documentSnapshot.getString(Constants.USER_MODEL_STREET);
+        this.zipCode = documentSnapshot.getString(Constants.USER_MODEL_ZIP_CODE);
+        this.city = documentSnapshot.getString(Constants.USER_MODEL_CITY);
     }
 
     public String getUid() {
