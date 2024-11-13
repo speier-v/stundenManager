@@ -123,4 +123,10 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
     }
+
+    @Override
+    public void signOutUser(ResultCallback<Boolean> resultCallback) {
+        firebaseAuth.signOut();
+        resultCallback.onSuccess(Result.success(true));
+    }
 }

@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.common;
+package com.albsig.stundenmanager.common.viewmodel;
 
 import android.util.Log;
 
@@ -10,10 +10,9 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
+import com.google.firebase.firestore.auth.User;
 
 import org.json.JSONObject;
-
-import java.util.logging.Logger;
 
 public class UserViewModel extends ViewModel {
 
@@ -45,4 +44,16 @@ public class UserViewModel extends ViewModel {
         });
     }
 
+    public void signOutUser() {
+        userRepository.signOutUser(new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                Log.d(TAG, "Logout successful");
+                userModelResult.setValue(Result.success(new UserModel()));
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) { Log.d(TAG, "Logout did not work. Try again later!"); }
+        });
+    }
 }

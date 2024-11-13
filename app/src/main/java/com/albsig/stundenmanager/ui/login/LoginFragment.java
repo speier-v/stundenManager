@@ -11,27 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.albsig.stundenmanager.MainActivity;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.Helpers;
-import com.albsig.stundenmanager.common.UserViewModel;
-import com.albsig.stundenmanager.common.callbacks.Result;
-import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
 import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.rpc.Help;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +30,6 @@ public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
     private FragmentLoginBinding binding;
     private FragmentTransaction fragmentTransaction;
-    private LoginListener loginListener;
     private Context mContext;
     private UserViewModel userViewModel;
 
@@ -49,15 +37,6 @@ public class LoginFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
-        if (context instanceof LoginListener) {
-            loginListener = (LoginListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement LoginListener");
-        }
-    }
-
-    public interface LoginListener {
-        void onLoginSuccess(String userId);
     }
 
     @Override
@@ -93,13 +72,27 @@ public class LoginFragment extends Fragment {
     private void initObserver() {
         userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
             if (!userModelResult.isSuccess()) {
-                Toast.makeText(getContext(), "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             UserModel userModel = userModelResult.getValue();
-            Log.d(TAG, "Login Successful" + userModel.getUid() + " " + userModel.getName());
+            if (userModel.getUid() == null) {
+                Log.d(TAG, "UserModel uid is null");
+                return;
+            }
+
+            Toast.makeText(mContext, "Login Successful", Toast.LENGTH_SHORT).show();
+            goToDashboard();
         });
+    }
+
+    private void goToDashboard() {
+        DashboardFragment dashboardFragment = new DashboardFragment();
+        fragmentTransaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+
+        fragmentTransaction.commit();
     }
 
     private void onLoginButtonClicked() {
@@ -133,18 +126,6 @@ public class LoginFragment extends Fragment {
 
         fragmentTransaction = getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
-        fragmentTransaction.commit();
-    }
-
-    private void updateUI(@Nullable FirebaseUser user) {
-        if (user == null) {
-            Toast.makeText(mContext, "Login not successful", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
-
         fragmentTransaction.commit();
     }
 }

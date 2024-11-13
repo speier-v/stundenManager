@@ -14,11 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
+import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -45,6 +47,7 @@ public class DashboardFragment extends Fragment {
     private String userId;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private static String TAG = "DashboardFragment";
+    private UserViewModel userViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -57,6 +60,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
     @Nullable
@@ -64,20 +68,13 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
 
-        if (getArguments() != null) {
-            userId = getArguments().getString("userId");
-        } else {
-            Log.e("DashboardFragment", "No userId found in arguments");
-        }
-
         FloatingActionButton fabAddSession = binding.fabAddSession;
         fabAddSession.setOnClickListener(v -> {
             showDatePicker();
         });
 
-        setupRecyclerView();
-        loadSessionDates();
-        signOut();
+//        setupRecyclerView();
+//        loadSessionDates();
         return binding.getRoot();
     }
 
@@ -108,12 +105,6 @@ public class DashboardFragment extends Fragment {
                         Log.e("DashboardFragment", "Error getting session dates", task.getException());
                     }
                 });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
 
     private void showDatePicker() {
@@ -183,16 +174,43 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initObserver();
+        signOut();
+
+    }
+
     private void signOut() {
         FloatingActionButton fabSignOut = binding.fabSignOut;
 
         fabSignOut.setOnClickListener(view -> {
-            FirebaseAuth.getInstance().signOut();
+            userViewModel.signOutUser();
             Toast.makeText(this.binding.getRoot().getContext(), "Signed out successfully", Toast.LENGTH_SHORT).show();
-            FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
-                    .setReorderingAllowed(true);
-            fragmentTransaction.commit();
+            goToLoginFragment();
+        });
+    }
+
+    private void goToLoginFragment() {
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
+                .setReorderingAllowed(true);
+        fragmentTransaction.commit();
+    }
+
+    private void initObserver() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+            if (!userModelResult.isSuccess()) {
+                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
         });
     }
 }
