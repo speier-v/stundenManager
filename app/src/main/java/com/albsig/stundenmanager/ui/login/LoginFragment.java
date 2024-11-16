@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.Helpers;
-import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
+import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;

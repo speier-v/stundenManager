@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.common.viewmodel;
+package com.albsig.stundenmanager.common.viewmodel.user;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;

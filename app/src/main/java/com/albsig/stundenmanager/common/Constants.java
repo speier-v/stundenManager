@@ -17,4 +17,11 @@ public class Constants {
     public static final String SESSIONS_COLLECTION = "sessions";
 
     public static final String HTTP_CALLABLE_REF_CREATE_USER = "createUser";
+
+    public static final String DATE_FORMAT = "dd.MM.yyyy";
+    public static final String SESSION_FIELD_START_TIME = "startTime";
+    public static final String SESSION_FIELD_END_TIME = "endTime";
+    public static final String SESSION_FIELD_BREAKS = "breaks";
+    public static final String BREAK_FIELD_START_TIME = "breakStart";
+    public static final String BREAK_FIELD_END_TIME = "breakEnd";
 }

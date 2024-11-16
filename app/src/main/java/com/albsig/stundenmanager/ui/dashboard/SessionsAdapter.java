@@ -25,11 +25,10 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
     private String userId;
     private Context context;
 
-    public SessionsAdapter(Context context, List<String> sessionDates, List<String> sessionIds, String userId) {
+    public SessionsAdapter(Context context, List<String> sessionDates, List<String> sessionIds) {
         this.context = context;
         this.sessionDates = sessionDates;
         this.sessionIds = sessionIds;
-        this.userId = userId;
     }
 
     public void updateData(List<String> newSessionDates, List<String> newSessionIds) {

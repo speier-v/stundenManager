@@ -14,19 +14,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
-import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
-import com.albsig.stundenmanager.common.viewmodel.UserViewModelFactory;
+import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentRegistrationBinding;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.transition.platform.MaterialSharedAxis;
-import com.google.firebase.functions.FirebaseFunctions;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class RegistrationFragment extends Fragment {

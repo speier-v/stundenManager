@@ -1,6 +1,11 @@
 package com.albsig.stundenmanager.common;
 
-import android.widget.Toast;
+import androidx.annotation.Nullable;
+
+import com.google.firebase.Timestamp;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Helpers {
 
@@ -14,5 +19,9 @@ public class Helpers {
         if (password == null)  return "Password is null";
         if(password.isEmpty())  return "Password cannot be empty";
         return "";
+    }
+
+    public static String FSTimestampToDateString(Timestamp timestamp) {
+        return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(timestamp.toDate());
     }
 }

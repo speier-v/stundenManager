@@ -15,12 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
-import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
+import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
+import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
@@ -29,7 +29,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +46,7 @@ public class DashboardFragment extends Fragment {
     private FirestoreUtil firestoreUtil;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserViewModel userViewModel;
+    private SessionViewModel sessionViewModel;
     private UserModel userModel;
 
     @Override
@@ -61,24 +61,19 @@ public class DashboardFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        sessionViewModel = new ViewModelProvider(requireActivity()).get(SessionViewModel.class);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
-
-        FloatingActionButton fabAddSession = binding.fabAddSession;
-        fabAddSession.setOnClickListener(v -> {
-            showDatePicker();
-        });
-
+        setupRecyclerView();
         return binding.getRoot();
     }
 
     private void setupRecyclerView() {
-        binding.recyclerViewSessions.setLayoutManager(new LinearLayoutManager(getContext()));
-        sessionsAdapter = new SessionsAdapter(this.binding.getRoot().getContext(), new ArrayList<>(), new ArrayList<>(), userModel.getUid());
+        sessionsAdapter = new SessionsAdapter(mContext, new ArrayList<>(), new ArrayList<>());
         binding.recyclerViewSessions.setAdapter(sessionsAdapter);
     }
 
@@ -185,7 +180,14 @@ public class DashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initObserver();
         signOut();
+        setAddSessionButton();
+    }
 
+    private void setAddSessionButton() {
+        FloatingActionButton fabAddSession = binding.fabAddSession;
+        fabAddSession.setOnClickListener(v -> {
+            showDatePicker();
+        });
     }
 
     private void initObserver() {
@@ -196,8 +198,16 @@ public class DashboardFragment extends Fragment {
             }
 
             userModel = userModelResult.getValue();
-            setupRecyclerView();
-            loadSessionDates();
+            sessionViewModel.getSessions(userModel.getUid());
+        });
+
+        sessionViewModel.getSessions().observe(getViewLifecycleOwner(), sessionsResult -> {
+            if (!sessionsResult.isSuccess()) {
+                Toast.makeText(mContext, "Session not found - " + sessionsResult.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+//            loadSessionDates();
         });
     }
 

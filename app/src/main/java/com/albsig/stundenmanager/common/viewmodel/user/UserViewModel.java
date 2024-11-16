@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.common.viewmodel;
+package com.albsig.stundenmanager.common.viewmodel.user;
 
 import android.util.Log;
 
@@ -10,7 +10,6 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
-import com.google.firebase.firestore.auth.User;
 
 import org.json.JSONObject;
 
