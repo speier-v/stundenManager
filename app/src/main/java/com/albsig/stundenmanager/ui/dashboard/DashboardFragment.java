@@ -22,13 +22,14 @@ import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
 import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
+import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,16 +39,15 @@ import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
-
+    private static final String TAG = "DashboardFragment";
     private Context mContext;
     private FragmentDashboardBinding binding;
     private SessionsAdapter sessionsAdapter;
     private FirebaseFirestore db;
     private FirestoreUtil firestoreUtil;
-    private String userId;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
-    private static String TAG = "DashboardFragment";
     private UserViewModel userViewModel;
+    private UserModel userModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -73,19 +73,19 @@ public class DashboardFragment extends Fragment {
             showDatePicker();
         });
 
-//        setupRecyclerView();
-//        loadSessionDates();
         return binding.getRoot();
     }
 
     private void setupRecyclerView() {
         binding.recyclerViewSessions.setLayoutManager(new LinearLayoutManager(getContext()));
-        sessionsAdapter = new SessionsAdapter(this.binding.getRoot().getContext(), new ArrayList<>(), new ArrayList<>(), userId);
+        sessionsAdapter = new SessionsAdapter(this.binding.getRoot().getContext(), new ArrayList<>(), new ArrayList<>(), userModel.getUid());
         binding.recyclerViewSessions.setAdapter(sessionsAdapter);
     }
 
     private void loadSessionDates() {
-        db.collection("users").document(userId).collection("sessions")
+        db.collection(Constants.USERS_COLLECTION)
+                .document(userModel.getUid())
+                .collection(Constants.SESSIONS_COLLECTION)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
@@ -155,7 +155,7 @@ public class DashboardFragment extends Fragment {
     }
 
     private void startWorkSessionWithCustomStartTime(Timestamp customStartTime) {
-        firestoreUtil.startWorkSession(userId, customStartTime, new FirestoreUtil.FirestoreCallback() {
+        firestoreUtil.startWorkSession(userModel.getUid(), customStartTime, new FirestoreUtil.FirestoreCallback() {
             @Override
             public void onSuccess(String sessionId) {
                 Log.d(TAG, "Started session with ID: " + sessionId);
@@ -188,6 +188,19 @@ public class DashboardFragment extends Fragment {
 
     }
 
+    private void initObserver() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+            if (!userModelResult.isSuccess()) {
+                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            userModel = userModelResult.getValue();
+            setupRecyclerView();
+            loadSessionDates();
+        });
+    }
+
     private void signOut() {
         FloatingActionButton fabSignOut = binding.fabSignOut;
 
@@ -203,14 +216,5 @@ public class DashboardFragment extends Fragment {
                 .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
                 .setReorderingAllowed(true);
         fragmentTransaction.commit();
-    }
-
-    private void initObserver() {
-        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
-            if (!userModelResult.isSuccess()) {
-                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-        });
     }
 }

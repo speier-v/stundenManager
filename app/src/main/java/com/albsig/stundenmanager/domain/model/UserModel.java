@@ -3,6 +3,8 @@ package com.albsig.stundenmanager.domain.model;
 import com.albsig.stundenmanager.common.Constants;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.Map;
+
 public class UserModel {
     private String uid;
     private String email;
@@ -35,6 +37,17 @@ public class UserModel {
         this.street = documentSnapshot.getString(Constants.USER_MODEL_STREET);
         this.zipCode = documentSnapshot.getString(Constants.USER_MODEL_ZIP_CODE);
         this.city = documentSnapshot.getString(Constants.USER_MODEL_CITY);
+    }
+
+    public UserModel(Map<String, Object> userMap) {
+        this.uid = (String) userMap.get(Constants.USER_MODEL_ID);
+        this.email = (String) userMap.get(Constants.USER_MODEL_EMAIL);
+        this.name = (String) userMap.get(Constants.USER_MODEL_NAME);
+        this.surname = (String) userMap.get(Constants.USER_MODEL_SURNAME);
+        this.date = (String) userMap.get(Constants.USER_MODEL_BIRTHDAY);
+        this.street = (String) userMap.get(Constants.USER_MODEL_STREET);
+        this.zipCode = (String) userMap.get(Constants.USER_MODEL_ZIP_CODE);
+        this.city = (String) userMap.get(Constants.USER_MODEL_CITY);
     }
 
     public String getUid() {

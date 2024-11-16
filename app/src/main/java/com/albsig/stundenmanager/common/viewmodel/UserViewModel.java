@@ -38,7 +38,7 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(Result<UserModel> error) {
-                Log.d(TAG, "Login failed " + error);
+                Log.d(TAG, "Login failed " + error.getError().toString());
                 userModelResult.setValue(error);
             }
         });
@@ -54,6 +54,21 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(Result<Boolean> error) { Log.d(TAG, "Logout did not work. Try again later!"); }
+        });
+    }
+
+    public void registerUser(JSONObject userData) {
+        userRepository.registerUser(userData, new ResultCallback<UserModel>(){
+
+            @Override
+            public void onSuccess(Result<UserModel> response) {
+                Log.d(TAG, "Registration successful");
+                userModelResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<UserModel> error) { Log.d(TAG, "Registration failed "); }
+
         });
     }
 }

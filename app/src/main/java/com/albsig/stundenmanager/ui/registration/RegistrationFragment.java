@@ -1,4 +1,5 @@
 package com.albsig.stundenmanager.ui.registration;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,32 +10,47 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
+import com.albsig.stundenmanager.common.viewmodel.UserViewModel;
+import com.albsig.stundenmanager.common.viewmodel.UserViewModelFactory;
 import com.albsig.stundenmanager.databinding.FragmentRegistrationBinding;
+import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.google.firebase.functions.FirebaseFunctions;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class RegistrationFragment extends Fragment {
 
-
     private static final String TAG = "RegistrationFragment";
-   @Nullable private FragmentRegistrationBinding binding;
+    @Nullable private FragmentRegistrationBinding binding;
+    private UserViewModel userViewModel;
+    private Context mContext;
+    private FragmentTransaction fragmentTransaction;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initSharedViewModel();
+    }
 
-        MaterialSharedAxis forward = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
-        setReenterTransition(forward);
-
-        MaterialSharedAxis backward = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
-        setReenterTransition(backward);
+    private void initSharedViewModel() {
+        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
 
@@ -49,6 +65,7 @@ public class RegistrationFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        fragmentTransaction = null;
     }
 
     @Override
@@ -56,7 +73,7 @@ public class RegistrationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initBtnRegistration();
         initBtnGoToLogin();
-
+        initObserver();
     }
 
     private void initBtnRegistration() {
@@ -72,29 +89,20 @@ public class RegistrationFragment extends Fragment {
             String zipCode = String.valueOf(binding.etZipCode.getText());
             String city = String.valueOf(binding.etCity.getText());
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("email", email);
-            data.put("password", password);
-            data.put("name", name);
-            data.put("surname", surname);
-            data.put("birthday", birthday);
-            data.put("street", street);
-            data.put("zipCode", zipCode);
-            data.put("city", city);
+            JSONObject userData = new JSONObject(
+                    Map.of(
+                            "email", email,
+                            "password", password,
+                            "name", name,
+                            "surname", surname,
+                            "birthday", birthday,
+                            "street", street,
+                            "zipCode", zipCode,
+                            "city", city
+                    )
+            );
 
-            FirebaseFunctions.getInstance()
-                    .getHttpsCallable("createUser")
-                    .call(data)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Registration successful", Toast.LENGTH_SHORT).show();
-                            goToLogin();
-                        } else {
-                            Exception e = task.getException();
-                            assert e != null;
-                            Toast.makeText(getContext(), "Registration failed" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-            });
+            userViewModel.registerUser(userData);
         });
     }
 
@@ -109,6 +117,26 @@ public class RegistrationFragment extends Fragment {
 
         FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, newLoginFragment, Constants.TAG_LOGIN);
+        fragmentTransaction.commit();
+    }
+
+    private void initObserver() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                Toast.makeText(mContext, "Registration failed" + result.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Toast.makeText(mContext, "Registration Successful", Toast.LENGTH_SHORT).show();
+            goToDashboard();
+        });
+    }
+
+    private void goToDashboard() {
+        DashboardFragment dashboardFragment = new DashboardFragment();
+        fragmentTransaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+
         fragmentTransaction.commit();
     }
 }

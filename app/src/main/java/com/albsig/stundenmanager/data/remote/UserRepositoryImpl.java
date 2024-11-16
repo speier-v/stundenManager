@@ -43,30 +43,27 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void registerUser(JSONObject userData, ResultCallback<UserModel> resultCallback) {
-        //        Map<String, Object> userData = new HashMap<>(
-//                Map.of(
-//                        "email", email,
-//                        "password", password,
-//                        "name", name,
-//                        "surname", surname,
-//                        "birthday", birthday,
-//                        "street", street,
-//                        "zipCode", zipCode,
-//                        "city", city
-//                )
-//        );
-//
-//        FirebaseFunctions.getInstance()
-//                .getHttpsCallable("createUser")
-//                .call(userData)
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        resultCallback.onSuccess(Result.success(user));
-//                    } else {
-//                        Exception e = task.getException();
-//                        assert e != null;
-//                    }
-//                });
+        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_USER)
+                .call(userData)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Exception e = task.getException();
+                        assert e != null;
+                        resultCallback.onError(Result.error(new Exception("Process could not be made " + e)));
+                        return;
+                    }
+
+                    Object result = task.getResult().getData();
+                    if(result == null) {
+                        resultCallback.onError(Result.error(new Exception("User not found")));
+                        return;
+                    }
+
+                    Map<String,Object> userMap = (Map<String, Object>) result;
+                    UserModel userModel = new UserModel(userMap);
+                    resultCallback.onSuccess(Result.success(userModel));
+
+                });
     }
 
     @Override
