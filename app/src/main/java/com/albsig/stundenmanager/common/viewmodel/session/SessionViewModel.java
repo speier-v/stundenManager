@@ -8,12 +8,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
-import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
-import com.albsig.stundenmanager.domain.repository.UserRepository;
-
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -45,5 +41,21 @@ public class SessionViewModel extends ViewModel {
                 sessionsResult.setValue(error);
             }
         });
+    }
+
+    public void deleteSession(String uid, String documentId, ResultCallback<Boolean> resultCallback) {
+        sessionRepository.deleteSession(uid, documentId, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                getSessions(uid);
+                resultCallback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                resultCallback.onError(error);
+            }
+        });
+
     }
 }

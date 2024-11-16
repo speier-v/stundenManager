@@ -71,8 +71,21 @@ public class SessionRepositoryImpl implements SessionRepository {
     }
 
     @Override
-    public void deleteSession(String sessionId, ResultCallback<Boolean> resultCallback) {
-
+    public void deleteSession(String uid, String sessionId, ResultCallback<Boolean> resultCallback) {
+        Log.d(TAG, "Delete session");
+        firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.SESSIONS_COLLECTION)
+                .document(sessionId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Delete session successful");
+                    resultCallback.onSuccess(Result.success(true));
+                })
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Delete session failed");
+                    resultCallback.onError(Result.error(e));
+                });
     }
 
     @Override

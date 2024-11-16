@@ -19,10 +19,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
+import com.albsig.stundenmanager.common.callbacks.Result;
+import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
@@ -30,13 +33,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends Fragment implements SessionsAdapter.OnSessionClickListener {
 
     private static final String TAG = "DashboardFragment";
     private Context mContext;
@@ -73,33 +77,12 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        sessionsAdapter = new SessionsAdapter(mContext, new ArrayList<>(), new ArrayList<>());
+        sessionsAdapter = new SessionsAdapter(this);
         binding.recyclerViewSessions.setAdapter(sessionsAdapter);
     }
 
-    private void loadSessionDates() {
-        db.collection(Constants.USERS_COLLECTION)
-                .document(userModel.getUid())
-                .collection(Constants.SESSIONS_COLLECTION)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<String> sessionDates = new ArrayList<>();
-                        List<String> sessionIds = new ArrayList<>();
-
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Timestamp startTime = document.getTimestamp("startTime");
-                            if (startTime != null) {
-                                String formattedDate = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(startTime.toDate());
-                                sessionDates.add(formattedDate);
-                                sessionIds.add(document.getId());
-                            }
-                        }
-                        sessionsAdapter.updateData(sessionDates, sessionIds);
-                    } else {
-                        Log.e("DashboardFragment", "Error getting session dates", task.getException());
-                    }
-                });
+    private void loadSessionDates(List<SessionModel> sessionList) {
+        sessionsAdapter.updateData(sessionList);
     }
 
     private void showDatePicker() {
@@ -154,7 +137,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onSuccess(String sessionId) {
                 Log.d(TAG, "Started session with ID: " + sessionId);
-                loadSessionDates();
+//                loadSessionDates();
             }
 
             @Override
@@ -172,6 +155,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        sessionsAdapter.clearListener();
         binding = null;
     }
 
@@ -198,6 +182,7 @@ public class DashboardFragment extends Fragment {
             }
 
             userModel = userModelResult.getValue();
+            sessionsAdapter.setUid(userModel.getUid());
             sessionViewModel.getSessions(userModel.getUid());
         });
 
@@ -207,7 +192,8 @@ public class DashboardFragment extends Fragment {
                 return;
             }
 
-//            loadSessionDates();
+            List<SessionModel> sessionList = sessionsResult.getValue();
+            loadSessionDates(sessionList);
         });
     }
 
@@ -226,5 +212,25 @@ public class DashboardFragment extends Fragment {
                 .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
                 .setReorderingAllowed(true);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onItemDelete(String uid, String documentId) {
+        sessionViewModel.deleteSession(uid, documentId, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                if(response.getValue()) Toast.makeText(mContext, "Session deleted successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                Toast.makeText(mContext, "Session not deleted - " + error.getError(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onItemClick(String uid, String documentId) {
+
     }
 }

@@ -1,41 +1,50 @@
 package com.albsig.stundenmanager.ui.dashboard;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
-import com.albsig.stundenmanager.ui.time.DetailTimeActivity;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.albsig.stundenmanager.common.Helpers;
+import com.albsig.stundenmanager.domain.model.session.SessionModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.SessionViewHolder> {
 
-    private List<String> sessionDates;
-    private List<String> sessionIds;
-    private String userId;
-    private Context context;
+    private final List<SessionModel> sessionList;
+    private String uid;
+    private OnSessionClickListener listener;
 
-    public SessionsAdapter(Context context, List<String> sessionDates, List<String> sessionIds) {
-        this.context = context;
-        this.sessionDates = sessionDates;
-        this.sessionIds = sessionIds;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
-    public void updateData(List<String> newSessionDates, List<String> newSessionIds) {
-        sessionDates.clear();
-        sessionIds.clear();
-        sessionDates.addAll(newSessionDates);
-        sessionIds.addAll(newSessionIds);
+    public interface OnSessionClickListener {
+        void onItemDelete(String uid, String documentId);
+
+        void onItemClick(String uid, String documentId);
+    }
+
+    public SessionsAdapter(OnSessionClickListener listener) {
+        this.sessionList = new ArrayList<SessionModel>();
+        this.listener = listener;
+    }
+
+    public void clearListener() { this.listener = null; }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<SessionModel> newSessionDates) {
+        sessionList.clear();
+        sessionList.addAll(newSessionDates);
         notifyDataSetChanged();
     }
 
@@ -48,40 +57,26 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
 
     @Override
     public void onBindViewHolder(@NonNull SessionViewHolder holder, int position) {
-        String date = sessionDates.get(position);
-        String sessionId = sessionIds.get(position);
-
+        SessionModel session = sessionList.get(position);
+        String date = Helpers.FSTimestampToDateString(session.getStartTime());
         holder.dateTextView.setText(date);
+        initListener(holder, session);
 
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetailTimeActivity.class);
-            intent.putExtra("userId", userId);
-            intent.putExtra("sessionId", sessionId);
-            context.startActivity(intent);
-        });
+//            Intent intent = new Intent(context, DetailTimeActivity.class);
+//            intent.putExtra("userId", userId); //TODO: LISTENER ACTIVATION IN FRAGMENT
+//            intent.putExtra("sessionId", session.getDocumentId());
+//            context.startActivity(intent); //TODO: TO FRAGMENT
+    }
 
-        holder.deleteButton.setOnClickListener(v -> {
-            FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .collection("sessions")
-                    .document(sessionId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(v.getContext(), "Session deleted", Toast.LENGTH_SHORT).show();
-                        sessionDates.remove(position);
-                        sessionIds.remove(position);
-                        notifyItemRemoved(position);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(v.getContext(), "Failed to delete session", Toast.LENGTH_SHORT).show();
-                    });
-        });
+    private void initListener(SessionViewHolder holder, SessionModel session) {
+
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session.getDocumentId()) );
+        holder.deleteButton.setOnClickListener(v -> listener.onItemDelete(uid, session.getDocumentId()) );
     }
 
     @Override
     public int getItemCount() {
-        return sessionDates.size();
+        return sessionList.size();
     }
 
     static class SessionViewHolder extends RecyclerView.ViewHolder {

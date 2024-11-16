@@ -14,7 +14,7 @@ public interface SessionRepository {
 
     void updateSession(JSONObject sessionData, ResultCallback<SessionModel> resultCallback);
 
-    void deleteSession(String sessionId, ResultCallback<Boolean> resultCallback);
+    void deleteSession(String uid, String sessionId, ResultCallback<Boolean> resultCallback);
 
     void getSession(String uid, ResultCallback<SessionModel> resultCallback);
 }
