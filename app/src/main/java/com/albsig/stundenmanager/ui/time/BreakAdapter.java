@@ -32,9 +32,7 @@ public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHol
     private String sessionId;
     private OnBreakDeletedListener onBreakDeletedListener;
 
-    public BreakAdapter(String userId, String sessionId, OnBreakDeletedListener onBreakDeletedListener) {
-        this.userId = userId;
-        this.sessionId = sessionId;
+    public BreakAdapter(OnBreakDeletedListener onBreakDeletedListener) {
         this.onBreakDeletedListener = onBreakDeletedListener;
     }
 

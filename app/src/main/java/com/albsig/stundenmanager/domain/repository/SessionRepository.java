@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.util.List;
 
 public interface SessionRepository {
-    void addSession(JSONObject sessionData, ResultCallback<SessionModel> resultCallback);
 
     void getSessions(String uid, ResultCallback<List<SessionModel>> resultCallback);
 
@@ -17,4 +16,6 @@ public interface SessionRepository {
     void deleteSession(String uid, String sessionId, ResultCallback<Boolean> resultCallback);
 
     void getSession(String uid, ResultCallback<SessionModel> resultCallback);
+
+    void createSession(JSONObject sessionData, ResultCallback<Boolean> resultCallback);
 }

@@ -8,14 +8,19 @@ import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.session.BreakModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SessionRepositoryImpl implements SessionRepository {
 
@@ -26,11 +31,6 @@ public class SessionRepositoryImpl implements SessionRepository {
     public SessionRepositoryImpl() {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFunctions = FirebaseFunctions.getInstance();
-    }
-
-    @Override
-    public void addSession(JSONObject sessionData, ResultCallback<SessionModel> resultCallback) {
-
     }
 
     @Override
@@ -90,6 +90,23 @@ public class SessionRepositoryImpl implements SessionRepository {
 
     @Override
     public void getSession(String uid, ResultCallback<SessionModel> resultCallback) {
+
+    }
+
+    @Override
+    public void createSession(JSONObject sessionData, ResultCallback<Boolean> resultCallback) {
+        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_SESSION)
+                .call(sessionData)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d(TAG, "Create session failed " + task.getException());
+                        resultCallback.onError(Result.error(task.getException()));
+                        return;
+                    }
+
+                    Log.d(TAG, "Create session successful");
+                    resultCallback.onSuccess(Result.success(true));
+                });
 
     }
 }

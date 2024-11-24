@@ -3,6 +3,7 @@ package com.albsig.stundenmanager.common;
 public class Constants {
     public static final String TAG_LOGIN = "Login";
     public static final String TAG_DASHBOARD = "Dashboard";
+    public static final String TAG_DETAIL_TIME = "DetailTime";
 
     public static final String USER_MODEL_ID = "uid";
     public static final String USER_MODEL_EMAIL = "email";
@@ -24,4 +25,5 @@ public class Constants {
     public static final String SESSION_FIELD_BREAKS = "breaks";
     public static final String BREAK_FIELD_START_TIME = "breakStart";
     public static final String BREAK_FIELD_END_TIME = "breakEnd";
+    public static final String HTTP_CALLABLE_REF_CREATE_SESSION = "createSession";
 }

@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.FirestoreUtil;
+import com.albsig.stundenmanager.common.Helpers;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
@@ -27,18 +28,17 @@ import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
+import com.albsig.stundenmanager.ui.time.DetailTimeFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 public class DashboardFragment extends Fragment implements SessionsAdapter.OnSessionClickListener {
 
@@ -48,10 +48,11 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     private SessionsAdapter sessionsAdapter;
     private FirebaseFirestore db;
     private FirestoreUtil firestoreUtil;
-    private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserViewModel userViewModel;
     private SessionViewModel sessionViewModel;
     private UserModel userModel;
+    private Timestamp startTime;
+    private Timestamp endTime;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -85,73 +86,6 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         sessionsAdapter.updateData(sessionList);
     }
 
-    private void showDatePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this.binding.getRoot().getContext(),
-                (view, yearSelected, monthSelected, daySelected) -> {
-                    selectedYear = yearSelected;
-                    selectedMonth = monthSelected;
-                    selectedDay = daySelected;
-                    showTimePicker();
-                }, year, month, day);
-
-        datePickerDialog.show();
-    }
-
-    private void showTimePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this.binding.getRoot().getContext(),
-                (view, hourOfDay, minuteSelected) -> {
-                    selectedHour = hourOfDay;
-                    selectedMinute = minuteSelected;
-
-                    Timestamp customStartTime = createCustomTimestamp(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute);
-
-                    startWorkSessionWithCustomStartTime(customStartTime);
-                }, hour, minute, true);
-
-        timePickerDialog.show();
-    }
-
-    private Timestamp createCustomTimestamp(int year, int month, int day, int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return new Timestamp(calendar.getTime());
-    }
-
-    private void startWorkSessionWithCustomStartTime(Timestamp customStartTime) {
-        firestoreUtil.startWorkSession(userModel.getUid(), customStartTime, new FirestoreUtil.FirestoreCallback() {
-            @Override
-            public void onSuccess(String sessionId) {
-                Log.d(TAG, "Started session with ID: " + sessionId);
-//                loadSessionDates();
-            }
-
-            @Override
-            public void onQuerySuccess(QuerySnapshot querySnapshot) {
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(binding.getRoot().getContext(), "A work session for this day already exists.", Toast.LENGTH_LONG).show();
-                Log.w(TAG, "Error starting session", e);
-            }
-        });
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -170,7 +104,60 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     private void setAddSessionButton() {
         FloatingActionButton fabAddSession = binding.fabAddSession;
         fabAddSession.setOnClickListener(v -> {
-            showDatePicker();
+            startCreateSession();
+        });
+    }
+
+    private void startCreateSession() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        //Create start date
+        new DatePickerDialog(mContext,
+                (viewDateStart, yearSelectedStart, monthSelectedStart, daySelectedStart) -> {
+            //Create start Time
+                    new TimePickerDialog(mContext,
+                            (viewTimerStart, hourOfDayStart, minuteSelectedStart) -> {
+                                //Create end date
+                                new DatePickerDialog(mContext,
+                                        (viewDateEnd, yearSelectedEnd, monthSelectedEnd, daySelectedEnd) -> {
+                                    //Create end time
+                                            new TimePickerDialog(mContext,
+                                                    (viewTimerEnd, hourOfDayEnd, minuteSelectedEnd) -> {
+                                                        Timestamp startTimestamp = Helpers.createCustomTimestamp(yearSelectedStart, monthSelectedStart, daySelectedStart, hourOfDayStart, minuteSelectedStart);
+                                                        Timestamp endTimestamp = Helpers.createCustomTimestamp(yearSelectedEnd, monthSelectedEnd, daySelectedEnd, hourOfDayEnd, minuteSelectedEnd);
+                                                        startWorkSessionWithCustomStartTime(startTimestamp, endTimestamp);
+                                                    }, hour, minute, true).show();
+                                        }, year, month, day).show();
+
+                            }, hour, minute, true).show();
+                }, year, month, day).show();
+    }
+
+    private void startWorkSessionWithCustomStartTime(Timestamp startTime, Timestamp endTime) {
+        JSONObject sessionData = new JSONObject(
+                Map.of(
+                        "uid",userModel.getUid(),
+                        "startTime", startTime.toDate().getTime(),
+                        "endTime", endTime.toDate().getTime(),
+                        "breaks", new ArrayList<Map<String, Timestamp>>()
+                )
+        );
+
+        sessionViewModel.createSession(sessionData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                Toast.makeText(binding.getRoot().getContext(), "Session created successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                Toast.makeText(binding.getRoot().getContext(), "Session not created - " + error.getError(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -231,6 +218,11 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
 
     @Override
     public void onItemClick(String uid, String documentId) {
+        DetailTimeFragment newDetailTimeFragment = new DetailTimeFragment();
 
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME)
+                .addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }

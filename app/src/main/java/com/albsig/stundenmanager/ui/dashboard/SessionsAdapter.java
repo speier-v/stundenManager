@@ -61,15 +61,9 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
         String date = Helpers.FSTimestampToDateString(session.getStartTime());
         holder.dateTextView.setText(date);
         initListener(holder, session);
-
-//            Intent intent = new Intent(context, DetailTimeActivity.class);
-//            intent.putExtra("userId", userId); //TODO: LISTENER ACTIVATION IN FRAGMENT
-//            intent.putExtra("sessionId", session.getDocumentId());
-//            context.startActivity(intent); //TODO: TO FRAGMENT
     }
 
     private void initListener(SessionViewHolder holder, SessionModel session) {
-
         holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session.getDocumentId()) );
         holder.deleteButton.setOnClickListener(v -> listener.onItemDelete(uid, session.getDocumentId()) );
     }

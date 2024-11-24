@@ -1,89 +1,60 @@
-//package com.albsig.stundenmanager.ui.time;
-//
-//import android.app.DatePickerDialog;
-//import android.app.TimePickerDialog;
-//import android.os.Bundle;
-//import android.view.View;
-//import android.widget.Button;
-//import android.widget.TextView;
-//import android.widget.Toast;
-//
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.recyclerview.widget.LinearLayoutManager;
-//import androidx.recyclerview.widget.RecyclerView;
-//
-//import com.albsig.stundenmanager.R;
-//import com.albsig.stundenmanager.common.FirestoreUtil;
-//import com.google.firebase.Timestamp;
-//import com.google.firebase.firestore.DocumentSnapshot;
-//import com.google.firebase.firestore.FirebaseFirestore;
-//
-//import java.text.SimpleDateFormat;
-//import java.util.Calendar;
-//import java.util.List;
-//import java.util.Locale;
-//import java.util.Map;
-//
-//public class DetailTimeActivity extends AppCompatActivity implements BreakAdapter.OnBreakDeletedListener {
-//
-//    private String userId;
-//    private String sessionId;
-//    private static final String TAG = "StartTimeActivity";
-//
-//    private FirestoreUtil firestoreUtil;
-//    private FirebaseFirestore db;
-//
-//    private TextView startTimeTextView;
-//    private TextView endTimeTextView;
-//    private Button addEndTimeButton;
-//    private Button addBreakButton;
-//    private RecyclerView breaksRecyclerView;
-//    private BreakAdapter breakAdapter;
-//
-//    private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
-//    private Timestamp selectedBreakStartTime;
-//    public enum TimestampTarget {
-//        END_SESaSION,
-//        BREAK_START,
-//        BREAK_END
-//    }
-//
-//    @Override
-//    public void onBreakDeleted() {
+package com.albsig.stundenmanager.ui.time;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
+import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
+import com.albsig.stundenmanager.databinding.FragmentDetailTimeBinding;
+import com.google.firebase.Timestamp;
+
+public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreakDeletedListener {
+
+    private static final String TAG = "DetailTimeFragment";
+
+    private Context mContext;
+    private FragmentDetailTimeBinding binding;
+    private UserViewModel userViewModel;
+    private SessionViewModel sessionViewModel;
+    private BreakAdapter breakAdapter;
+
+    private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
+    private Timestamp selectedBreakStartTime;
+
+    public enum TimestampTarget {
+        END_SESaSION,
+        BREAK_START,
+        BREAK_END
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initSharedViewModel();
 //        loadSessionDetails();
-//    }
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.fragment_detail_time);
-//
-//        startTimeTextView = findViewById(R.id.startTimeTextView);
-//        endTimeTextView = findViewById(R.id.endTimeTextView);
-//        addEndTimeButton = findViewById(R.id.addEndTimeButton);
-//        addBreakButton = findViewById(R.id.addBreakButton);
-//        breaksRecyclerView = findViewById(R.id.breaksRecyclerView);
-//
-//        userId = getIntent().getStringExtra("userId");
-//        sessionId = getIntent().getStringExtra("sessionId");
-//        firestoreUtil = new FirestoreUtil();
-//        db = firestoreUtil.getInstance();
-//
-//        breaksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        breakAdapter = new BreakAdapter(userId, sessionId, this);
-//        breaksRecyclerView.setAdapter(breakAdapter);
-//
-//        loadSessionDetails();
-//
-//        addEndTimeButton.setOnClickListener(v -> {
-//            showDatePicker(TimestampTarget.END_SESSION);
-//        });
-//
-//        addBreakButton.setOnClickListener(v -> {
-//            showDatePicker(TimestampTarget.BREAK_START);
-//        });
-//    }
-//
+    }
+
+    private void initSharedViewModel() {
+        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        sessionViewModel = new ViewModelProvider(requireActivity()).get(SessionViewModel.class);
+    }
+
 //    private void loadSessionDetails() {
 //        db.collection("users")
 //                .document(userId)
@@ -191,4 +162,62 @@
 //        firestoreUtil.addBreakToSession(userId, sessionId, startBreak, endBreak);
 //        loadSessionDetails();
 //    }
-//}
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentDetailTimeBinding.inflate(inflater, container, false);
+        setupRecyclerView();
+        return binding.getRoot();
+    }
+
+    private void setupRecyclerView() {
+        breakAdapter = new BreakAdapter(this);
+        binding.breaksRecyclerView.setAdapter(breakAdapter);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setEndTimeListener();
+        setBreakButtonListener();
+        initObserver();
+    }
+
+    private void setEndTimeListener() {
+//        addEndTimeButton.setOnClickListener(v -> {
+//            showDatePicker(TimestampTarget.END_SESSION);
+//        });
+    }
+
+    private void setBreakButtonListener() {
+//        addBreakButton.setOnClickListener(v -> {
+//            showDatePicker(TimestampTarget.BREAK_START);
+//        });
+    }
+
+    private void initObserver() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                Toast.makeText(mContext, "failed to get user data" + result.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Toast.makeText(mContext, "SuccessUser", Toast.LENGTH_SHORT).show();
+        });
+
+        sessionViewModel.getSessions().observe(getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                Toast.makeText(mContext, "failed to get sessions" + result.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Toast.makeText(mContext, "SuccessSession", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onBreakDeleted() {
+
+    }
+}
