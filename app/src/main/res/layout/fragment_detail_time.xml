@@ -47,22 +47,12 @@
         android:layout_marginTop="4dp"/>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/addEndTimeButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@id/gl_start"
-        app:layout_constraintTop_toBottomOf="@id/endTimeTextView"
-        app:layout_constraintEnd_toEndOf="@id/gl_end"
-        android:text="@string/add_end_time"
-        android:layout_marginTop="24dp"/>
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/addBreakButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/gl_start"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
-        app:layout_constraintTop_toBottomOf="@id/addEndTimeButton"
+        app:layout_constraintTop_toBottomOf="@id/endTimeTextView"
         android:text="@string/add_break"
         android:layout_marginTop="12dp"/>
 
@@ -74,7 +64,8 @@
         app:layout_constraintTop_toBottomOf="@id/addBreakButton"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="12dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
