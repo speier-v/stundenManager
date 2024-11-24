@@ -31,7 +31,7 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
     public interface OnSessionClickListener {
         void onItemDelete(String uid, String documentId);
 
-        void onItemClick(String uid, String documentId);
+        void onItemClick(String uid, SessionModel session);
     }
 
     public SessionsAdapter(OnSessionClickListener listener) {
@@ -64,7 +64,7 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
     }
 
     private void initListener(SessionViewHolder holder, SessionModel session) {
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session.getDocumentId()) );
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session) );
         holder.deleteButton.setOnClickListener(v -> listener.onItemDelete(uid, session.getDocumentId()) );
     }
 

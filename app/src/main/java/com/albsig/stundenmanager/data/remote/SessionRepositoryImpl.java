@@ -10,7 +10,9 @@ import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 
@@ -108,5 +110,38 @@ public class SessionRepositoryImpl implements SessionRepository {
                     resultCallback.onSuccess(Result.success(true));
                 });
 
+    }
+
+    @Override
+    public void createBreak(JSONObject breakData, ResultCallback<Boolean> resultCallback) {
+        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_BREAK)
+                .call(breakData)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d(TAG, "Create break failed " + task.getException());
+                        resultCallback.onError(Result.error(task.getException()));
+                        return;
+                    }
+
+                    Log.d(TAG, "Create break successful");
+                    resultCallback.onSuccess(Result.success(true));
+                });
+    }
+
+    @Override
+    public void deleteBreak(String uid, String documentId, BreakModel breakModel, ResultCallback<Boolean> resultCallback) {
+        firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.SESSIONS_COLLECTION)
+                .document(documentId)
+                .update("breaks", FieldValue.arrayRemove(breakModel))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Delete break successful");
+                    resultCallback.onSuccess(Result.success(true));
+
+                }).addOnFailureListener( e -> {
+                    Log.d(TAG, "Delete break failed " + e.toString());
+                    resultCallback.onError(Result.error(e));
+                });
     }
 }

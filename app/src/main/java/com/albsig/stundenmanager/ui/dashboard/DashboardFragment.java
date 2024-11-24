@@ -217,9 +217,9 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     }
 
     @Override
-    public void onItemClick(String uid, String documentId) {
+    public void onItemClick(String uid, SessionModel session) {
+        sessionViewModel.setSelectedSession(Result.success(session));
         DetailTimeFragment newDetailTimeFragment = new DetailTimeFragment();
-
         FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME)
                 .addToBackStack(null);

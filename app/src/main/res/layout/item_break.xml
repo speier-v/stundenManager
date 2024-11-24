@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,25 +6,34 @@
     android:padding="8dp">
 
     <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:id="@+id/breakStartTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/break_start"
-        android:layout_marginEnd="16dp"
-        android:textSize="16sp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/break_start"/>
 
     <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
         android:id="@+id/breakEndTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/breakStartTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:text="@string/break_end"
-        android:layout_marginEnd="16dp"
-        android:textSize="16sp"/>
+        android:layout_marginStart="16dp"/>
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
         android:id="@+id/deleteBreakButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:icon="@drawable/ic_close"/>
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

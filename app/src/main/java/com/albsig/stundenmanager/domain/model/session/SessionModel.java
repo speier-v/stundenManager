@@ -4,9 +4,10 @@ import com.albsig.stundenmanager.common.Constants;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SessionModel {
+public class SessionModel implements Serializable {
     String documentId;
     Timestamp startTime;
     Timestamp endTime;

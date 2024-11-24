@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.domain.model.session.BreakModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
 
@@ -20,6 +21,7 @@ public class SessionViewModel extends ViewModel {
     private static final String TAG = "SessionViewModel";
     private final SessionRepository sessionRepository;
     private final MutableLiveData<Result<List<SessionModel>>> sessionsResult = new MutableLiveData<>();
+    private final MutableLiveData<Result<SessionModel>> selectedSessionResult = new MutableLiveData<>();
 
     public SessionViewModel(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
@@ -28,6 +30,10 @@ public class SessionViewModel extends ViewModel {
     public LiveData<Result<List<SessionModel>>> getSessions() {
         return sessionsResult;
     }
+
+    public void setSelectedSession(Result<SessionModel> session) { selectedSessionResult.setValue(session); }
+
+    public LiveData<Result<SessionModel>> getSelectedSession() { return selectedSessionResult; }
 
     public void getSessions(String uid) {
         sessionRepository.getSessions(uid,  new ResultCallback<List<SessionModel>>() {
@@ -69,6 +75,38 @@ public class SessionViewModel extends ViewModel {
                 getSessions(uid);
                 resultCallback.onSuccess(response);
             }
+            @Override
+            public void onError(Result<Boolean> error) {
+                resultCallback.onError(error);
+            }
+        });
+    }
+
+    public void createBreak(JSONObject breakData, ResultCallback<Boolean> resultCallback) {
+        sessionRepository.createBreak(breakData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                String uid = breakData.optString("uid");
+                getSessions(uid);
+                resultCallback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                resultCallback.onError(error);
+            }
+        });
+    }
+
+    public void deleteBreak(String uid, String documentId, BreakModel breakModel, ResultCallback<Boolean> resultCallback) {
+        sessionRepository.deleteBreak(uid, documentId, breakModel, new ResultCallback<Boolean>() {
+
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                getSessions(uid);
+                resultCallback.onSuccess(response);
+            }
+
             @Override
             public void onError(Result<Boolean> error) {
                 resultCallback.onError(error);

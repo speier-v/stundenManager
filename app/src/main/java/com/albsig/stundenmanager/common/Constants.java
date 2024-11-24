@@ -26,4 +26,7 @@ public class Constants {
     public static final String BREAK_FIELD_START_TIME = "breakStart";
     public static final String BREAK_FIELD_END_TIME = "breakEnd";
     public static final String HTTP_CALLABLE_REF_CREATE_SESSION = "createSession";
+    public static final String HTTP_CALLABLE_REF_CREATE_BREAK = "createBreak";
+    public static final String FORMATTED_DATE_PATTERN = "dd.MM.yyyy HH:mm";
+
 }
