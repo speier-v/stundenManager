@@ -23,4 +23,12 @@ public interface SessionRepository {
     void createBreak(JSONObject breakData, ResultCallback<Boolean> resultCallback);
 
     void deleteBreak(String uid, String documentId, BreakModel breakModel, ResultCallback<Boolean> resultCallback);
+
+    void addSessionsSnapshotListener(String uid, ResultCallback<List<SessionModel>> resultCallback);
+
+    void removeSessionsSnapshotListener();
+
+    void addSessionSnapshotListener(String uid, String documentId, ResultCallback<SessionModel> resultCallback);
+
+    void removeSessionSnapshotListener();
 }

@@ -2,6 +2,8 @@ package com.albsig.stundenmanager.data.remote;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
@@ -10,10 +12,16 @@ import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 
 import org.json.JSONException;
@@ -27,12 +35,85 @@ import java.util.Map;
 public class SessionRepositoryImpl implements SessionRepository {
 
     private static final String TAG = "SessionRepository";
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseFunctions firebaseFunctions;
+    private final FirebaseFirestore firebaseFirestore;
+    private final FirebaseFunctions firebaseFunctions;
+
+    private ListenerRegistration sessionsSnapshotListener;
+    private ListenerRegistration sessionSnapshotListener;
 
     public SessionRepositoryImpl() {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFunctions = FirebaseFunctions.getInstance();
+    }
+
+    @Override
+    public void addSessionsSnapshotListener(String uid, ResultCallback<List<SessionModel>> resultCallback) {
+        sessionsSnapshotListener = firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.SESSIONS_COLLECTION)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException err) {
+                if (err != null) {
+                    Log.d(TAG, "Listen failed " + err.toString());
+                    return;
+                }
+
+                if(queryDocumentSnapshots == null) {
+                    Log.d(TAG, "Collection is null");
+                    return;
+                }
+
+                List<SessionModel> sessionModels = new ArrayList<>();
+                for(DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    SessionModel sessionModel = document.toObject(SessionModel.class);
+                    assert sessionModel != null;
+                    sessionModel.setDocumentId(document.getId());
+                    sessionModels.add(sessionModel);
+                }
+
+                Log.d(TAG, "Collection data: " + queryDocumentSnapshots.getDocuments());
+                resultCallback.onSuccess(Result.success(sessionModels));
+            }
+        });
+    }
+
+    @Override
+    public void removeSessionsSnapshotListener() {
+        sessionsSnapshotListener.remove();
+    }
+
+    @Override
+    public void addSessionSnapshotListener(String uid, String documentId, ResultCallback<SessionModel> resultCallback) {
+        sessionSnapshotListener = firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.SESSIONS_COLLECTION)
+                .document(documentId)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException err) {
+                        if (err != null) {
+                            Log.d(TAG, "Listen failed " + err.toString());
+                            return;
+                        }
+
+                        if(documentSnapshot == null) {
+                            Log.d(TAG, "Document is null");
+                            return;
+                        }
+
+                        Log.d(TAG, "Document data: " + documentSnapshot.getData());
+                        SessionModel sessionModel = documentSnapshot.toObject(SessionModel.class);
+                        assert sessionModel != null;
+                        sessionModel.setDocumentId(documentSnapshot.getId());
+                        resultCallback.onSuccess(Result.success(sessionModel));
+                    }
+                });
+    }
+
+    @Override
+    public void removeSessionSnapshotListener() {
+        sessionSnapshotListener.remove();
     }
 
     @Override
