@@ -44,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initLogin() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
-                .setReorderingAllowed(true);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN).setReorderingAllowed(true);
         fragmentTransaction.commit();
     }
 }

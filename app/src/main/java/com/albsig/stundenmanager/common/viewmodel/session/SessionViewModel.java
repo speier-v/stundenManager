@@ -31,12 +31,16 @@ public class SessionViewModel extends ViewModel {
         return sessionsResult;
     }
 
-    public void setSelectedSession(Result<SessionModel> session) { selectedSessionResult.setValue(session); }
+    public void setSelectedSession(Result<SessionModel> session) {
+        selectedSessionResult.setValue(session);
+    }
 
-    public LiveData<Result<SessionModel>> getSelectedSession() { return selectedSessionResult; }
+    public LiveData<Result<SessionModel>> getSelectedSession() {
+        return selectedSessionResult;
+    }
 
     public void getSessions(String uid) {
-        sessionRepository.getSessions(uid,  new ResultCallback<List<SessionModel>>() {
+        sessionRepository.getSessions(uid, new ResultCallback<List<SessionModel>>() {
             @Override
             public void onSuccess(Result<List<SessionModel>> response) {
                 Log.d(TAG, "Get sessions successful");
@@ -75,6 +79,7 @@ public class SessionViewModel extends ViewModel {
                 getSessions(uid);
                 resultCallback.onSuccess(response);
             }
+
             @Override
             public void onError(Result<Boolean> error) {
                 resultCallback.onError(error);

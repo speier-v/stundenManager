@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -65,7 +64,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         sessionViewModel = new ViewModelProvider(requireActivity()).get(SessionViewModel.class);
     }
 
@@ -117,36 +116,25 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         int minute = calendar.get(Calendar.MINUTE);
 
         //Create start date
-        new DatePickerDialog(mContext,
-                (viewDateStart, yearSelectedStart, monthSelectedStart, daySelectedStart) -> {
+        new DatePickerDialog(mContext, (viewDateStart, yearSelectedStart, monthSelectedStart, daySelectedStart) -> {
             //Create start Time
-                    new TimePickerDialog(mContext,
-                            (viewTimerStart, hourOfDayStart, minuteSelectedStart) -> {
-                                //Create end date
-                                new DatePickerDialog(mContext,
-                                        (viewDateEnd, yearSelectedEnd, monthSelectedEnd, daySelectedEnd) -> {
-                                    //Create end time
-                                            new TimePickerDialog(mContext,
-                                                    (viewTimerEnd, hourOfDayEnd, minuteSelectedEnd) -> {
-                                                        Timestamp startTimestamp = Helpers.createCustomTimestamp(yearSelectedStart, monthSelectedStart, daySelectedStart, hourOfDayStart, minuteSelectedStart);
-                                                        Timestamp endTimestamp = Helpers.createCustomTimestamp(yearSelectedEnd, monthSelectedEnd, daySelectedEnd, hourOfDayEnd, minuteSelectedEnd);
-                                                        startWorkSessionWithCustomStartTime(startTimestamp, endTimestamp);
-                                                    }, hour, minute, true).show();
-                                        }, year, month, day).show();
-
-                            }, hour, minute, true).show();
+            new TimePickerDialog(mContext, (viewTimerStart, hourOfDayStart, minuteSelectedStart) -> {
+                //Create end date
+                new DatePickerDialog(mContext, (viewDateEnd, yearSelectedEnd, monthSelectedEnd, daySelectedEnd) -> {
+                    //Create end time
+                    new TimePickerDialog(mContext, (viewTimerEnd, hourOfDayEnd, minuteSelectedEnd) -> {
+                        Timestamp startTimestamp = Helpers.createCustomTimestamp(yearSelectedStart, monthSelectedStart, daySelectedStart, hourOfDayStart, minuteSelectedStart);
+                        Timestamp endTimestamp = Helpers.createCustomTimestamp(yearSelectedEnd, monthSelectedEnd, daySelectedEnd, hourOfDayEnd, minuteSelectedEnd);
+                        startWorkSessionWithCustomStartTime(startTimestamp, endTimestamp);
+                    }, hour, minute, true).show();
                 }, year, month, day).show();
+
+            }, hour, minute, true).show();
+        }, year, month, day).show();
     }
 
     private void startWorkSessionWithCustomStartTime(Timestamp startTime, Timestamp endTime) {
-        JSONObject sessionData = new JSONObject(
-                Map.of(
-                        "uid",userModel.getUid(),
-                        "startTime", startTime.toDate().getTime(),
-                        "endTime", endTime.toDate().getTime(),
-                        "breaks", new ArrayList<Map<String, Timestamp>>()
-                )
-        );
+        JSONObject sessionData = new JSONObject(Map.of("uid", userModel.getUid(), "startTime", startTime.toDate().getTime(), "endTime", endTime.toDate().getTime(), "breaks", new ArrayList<Map<String, Timestamp>>()));
 
         sessionViewModel.createSession(sessionData, new ResultCallback<Boolean>() {
             @Override
@@ -195,9 +183,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     }
 
     private void goToLoginFragment() {
-        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN)
-                .setReorderingAllowed(true);
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, LoginFragment.class, null, Constants.TAG_LOGIN).setReorderingAllowed(true);
         fragmentTransaction.commit();
     }
 
@@ -206,7 +192,8 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         sessionViewModel.deleteSession(uid, documentId, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                if(response.getValue()) Toast.makeText(mContext, "Session deleted successfully", Toast.LENGTH_SHORT).show();
+                if (response.getValue())
+                    Toast.makeText(mContext, "Session deleted successfully", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -220,9 +207,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     public void onItemClick(String uid, SessionModel session) {
         sessionViewModel.setSelectedSession(Result.success(session));
         DetailTimeFragment newDetailTimeFragment = new DetailTimeFragment();
-        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME)
-                .addToBackStack(null);
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME).addToBackStack(null);
         fragmentTransaction.commit();
     }
 }

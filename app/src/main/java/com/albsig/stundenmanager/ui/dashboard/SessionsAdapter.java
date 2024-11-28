@@ -1,7 +1,6 @@
 package com.albsig.stundenmanager.ui.dashboard;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,9 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
         this.listener = listener;
     }
 
-    public void clearListener() { this.listener = null; }
+    public void clearListener() {
+        this.listener = null;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void updateData(List<SessionModel> newSessionDates) {
@@ -64,8 +65,8 @@ public class SessionsAdapter extends RecyclerView.Adapter<SessionsAdapter.Sessio
     }
 
     private void initListener(SessionViewHolder holder, SessionModel session) {
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session) );
-        holder.deleteButton.setOnClickListener(v -> listener.onItemDelete(uid, session.getDocumentId()) );
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(uid, session));
+        holder.deleteButton.setOnClickListener(v -> listener.onItemDelete(uid, session.getDocumentId()));
     }
 
     @Override

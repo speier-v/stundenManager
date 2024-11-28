@@ -6,13 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
-import com.albsig.stundenmanager.common.FirestoreUtil;
 import com.albsig.stundenmanager.domain.model.session.BreakModel;
 import com.google.firebase.Timestamp;
 
@@ -20,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHolder> {
 
@@ -54,7 +51,9 @@ public class BreakAdapter extends RecyclerView.Adapter<BreakAdapter.BreakViewHol
         holder.breakStartTextView.setText(breakStart != null ? timeFormat.format(breakStart.toDate()) : "Not set");
         holder.breakEndTextView.setText(breakEnd != null ? timeFormat.format(breakEnd.toDate()) : "Not set");
 
-        holder.deleteBreakButton.setOnClickListener(v -> {onBreakClickListener.onBreakDeleted(breakEntry); });
+        holder.deleteBreakButton.setOnClickListener(v -> {
+            onBreakClickListener.onBreakDeleted(breakEntry);
+        });
     }
 
     @Override

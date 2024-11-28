@@ -1,4 +1,5 @@
 package com.albsig.stundenmanager.ui.registration;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,7 +28,8 @@ import java.util.Map;
 public class RegistrationFragment extends Fragment {
 
     private static final String TAG = "RegistrationFragment";
-    @Nullable private FragmentRegistrationBinding binding;
+    @Nullable
+    private FragmentRegistrationBinding binding;
     private UserViewModel userViewModel;
     private Context mContext;
     private FragmentTransaction fragmentTransaction;
@@ -45,14 +47,14 @@ public class RegistrationFragment extends Fragment {
     }
 
     private void initSharedViewModel() {
-        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentRegistrationBinding.inflate(inflater, container, false );
+        binding = FragmentRegistrationBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -74,7 +76,7 @@ public class RegistrationFragment extends Fragment {
     private void initBtnRegistration() {
         assert binding != null;
         MaterialButton btnRegistration = binding.btnRegistration;
-        btnRegistration.setOnClickListener( view1 -> {
+        btnRegistration.setOnClickListener(view1 -> {
             String email = String.valueOf(binding.etEmail.getText());
             String password = String.valueOf(binding.etPassword.getText());
             String name = String.valueOf(binding.etName.getText());
@@ -84,18 +86,7 @@ public class RegistrationFragment extends Fragment {
             String zipCode = String.valueOf(binding.etZipCode.getText());
             String city = String.valueOf(binding.etCity.getText());
 
-            JSONObject userData = new JSONObject(
-                    Map.of(
-                            "email", email,
-                            "password", password,
-                            "name", name,
-                            "surname", surname,
-                            "birthday", birthday,
-                            "street", street,
-                            "zipCode", zipCode,
-                            "city", city
-                    )
-            );
+            JSONObject userData = new JSONObject(Map.of("email", email, "password", password, "name", name, "surname", surname, "birthday", birthday, "street", street, "zipCode", zipCode, "city", city));
 
             userViewModel.registerUser(userData);
         });
@@ -104,14 +95,13 @@ public class RegistrationFragment extends Fragment {
     private void initBtnGoToLogin() {
         assert binding != null;
         MaterialButton btnGoToLogin = binding.btnGoToLogin;
-        btnGoToLogin.setOnClickListener( view1 -> goToLogin() );
+        btnGoToLogin.setOnClickListener(view1 -> goToLogin());
     }
 
     private void goToLogin() {
         LoginFragment newLoginFragment = new LoginFragment();
 
-        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, newLoginFragment, Constants.TAG_LOGIN);
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newLoginFragment, Constants.TAG_LOGIN);
         fragmentTransaction.commit();
     }
 
@@ -129,8 +119,7 @@ public class RegistrationFragment extends Fragment {
 
     private void goToDashboard() {
         DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
 
         fragmentTransaction.commit();
     }
