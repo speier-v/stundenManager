@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -42,14 +43,14 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false );
+        binding = FragmentLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -89,8 +90,7 @@ public class LoginFragment extends Fragment {
 
     private void goToDashboard() {
         DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
 
         fragmentTransaction.commit();
     }
@@ -98,14 +98,14 @@ public class LoginFragment extends Fragment {
     private void onLoginButtonClicked() {
         String email = binding.etEmail.getText() != null ? binding.etEmail.getText().toString() : "";
         String checkMail = Helpers.checkLoginMail(email);
-        if(!checkMail.isEmpty()) {
+        if (!checkMail.isEmpty()) {
             Toast.makeText(getContext(), "E-Mail is empty", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String password = binding.etPassword.getText() != null ? binding.etPassword.getText().toString() : "";
         String checkPassword = Helpers.checkLoginPassword(password);
-        if(!checkPassword.isEmpty()){
+        if (!checkPassword.isEmpty()) {
             Toast.makeText(getContext(), "Password is empty", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -124,8 +124,7 @@ public class LoginFragment extends Fragment {
     private void goToRegistration() {
         RegistrationFragment newRegistrationFragment = new RegistrationFragment();
 
-        fragmentTransaction = getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
         fragmentTransaction.commit();
     }
 }

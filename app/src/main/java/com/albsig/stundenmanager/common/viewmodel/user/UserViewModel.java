@@ -28,7 +28,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public void loginUser(JSONObject userData) {
-        userRepository.loginUser(userData,  new ResultCallback<UserModel>() {
+        userRepository.loginUser(userData, new ResultCallback<UserModel>() {
             @Override
             public void onSuccess(Result<UserModel> response) {
                 Log.d(TAG, "Login successful");
@@ -52,12 +52,14 @@ public class UserViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(Result<Boolean> error) { Log.d(TAG, "Logout did not work. Try again later!"); }
+            public void onError(Result<Boolean> error) {
+                Log.d(TAG, "Logout did not work. Try again later!");
+            }
         });
     }
 
     public void registerUser(JSONObject userData) {
-        userRepository.registerUser(userData, new ResultCallback<UserModel>(){
+        userRepository.registerUser(userData, new ResultCallback<UserModel>() {
 
             @Override
             public void onSuccess(Result<UserModel> response) {
@@ -66,7 +68,9 @@ public class UserViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(Result<UserModel> error) { Log.d(TAG, "Registration failed "); }
+            public void onError(Result<UserModel> error) {
+                Log.d(TAG, "Registration failed ");
+            }
 
         });
     }

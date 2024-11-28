@@ -46,8 +46,10 @@ public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreak
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private Timestamp selectedBreakStartTime;
 
-    @Nullable  private SessionModel sessionModel;
-    @Nullable  private UserModel userModel;
+    @Nullable
+    private SessionModel sessionModel;
+    @Nullable
+    private UserModel userModel;
 
     @Override
     public void onBreakDeleted(BreakModel breakModel) {
@@ -80,7 +82,7 @@ public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreak
     }
 
     private void initSharedViewModel() {
-        userViewModel  = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         sessionViewModel = new ViewModelProvider(requireActivity()).get(SessionViewModel.class);
     }
 
@@ -152,39 +154,28 @@ public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreak
         int minute = calendar.get(Calendar.MINUTE);
 
         //Create start date
-        new DatePickerDialog(mContext,
-                (viewDateStart, yearSelectedStart, monthSelectedStart, daySelectedStart) -> {
-                    //Create start Time
-                    new TimePickerDialog(mContext,
-                            (viewTimerStart, hourOfDayStart, minuteSelectedStart) -> {
-                                //Create end date
-                                new DatePickerDialog(mContext,
-                                        (viewDateEnd, yearSelectedEnd, monthSelectedEnd, daySelectedEnd) -> {
-                                            //Create end time
-                                            new TimePickerDialog(mContext,
-                                                    (viewTimerEnd, hourOfDayEnd, minuteSelectedEnd) -> {
-                                                        Timestamp startTimestamp = Helpers.createCustomTimestamp(yearSelectedStart, monthSelectedStart, daySelectedStart, hourOfDayStart, minuteSelectedStart);
-                                                        Timestamp endTimestamp = Helpers.createCustomTimestamp(yearSelectedEnd, monthSelectedEnd, daySelectedEnd, hourOfDayEnd, minuteSelectedEnd);
-                                                        createBreak(startTimestamp, endTimestamp);
-                                                    }, hour, minute, true).show();
-                                        }, year, month, day).show();
-
-                            }, hour, minute, true).show();
+        new DatePickerDialog(mContext, (viewDateStart, yearSelectedStart, monthSelectedStart, daySelectedStart) -> {
+            //Create start Time
+            new TimePickerDialog(mContext, (viewTimerStart, hourOfDayStart, minuteSelectedStart) -> {
+                //Create end date
+                new DatePickerDialog(mContext, (viewDateEnd, yearSelectedEnd, monthSelectedEnd, daySelectedEnd) -> {
+                    //Create end time
+                    new TimePickerDialog(mContext, (viewTimerEnd, hourOfDayEnd, minuteSelectedEnd) -> {
+                        Timestamp startTimestamp = Helpers.createCustomTimestamp(yearSelectedStart, monthSelectedStart, daySelectedStart, hourOfDayStart, minuteSelectedStart);
+                        Timestamp endTimestamp = Helpers.createCustomTimestamp(yearSelectedEnd, monthSelectedEnd, daySelectedEnd, hourOfDayEnd, minuteSelectedEnd);
+                        createBreak(startTimestamp, endTimestamp);
+                    }, hour, minute, true).show();
                 }, year, month, day).show();
+
+            }, hour, minute, true).show();
+        }, year, month, day).show();
     }
 
     private void createBreak(Timestamp startTimestamp, Timestamp endTimestamp) {
         assert userModel != null;
         assert sessionModel != null;
 
-        JSONObject breakData = new JSONObject(
-                Map.of(
-                        "uid", userModel.getUid(),
-                        "documentId", sessionModel.getDocumentId(),
-                        "startTime", startTimestamp.toDate().getTime(),
-                        "endTime", endTimestamp.toDate().getTime()
-                )
-        );
+        JSONObject breakData = new JSONObject(Map.of("uid", userModel.getUid(), "documentId", sessionModel.getDocumentId(), "startTime", startTimestamp.toDate().getTime(), "endTime", endTimestamp.toDate().getTime()));
 
         sessionViewModel.createBreak(breakData, new ResultCallback<Boolean>() {
             @Override

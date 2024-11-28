@@ -15,7 +15,8 @@ public class UserModel {
     private String zipCode;
     private String city;
 
-    public UserModel() {}
+    public UserModel() {
+    }
 
     public UserModel(String uid, String email, String name, String surname, String date, String street, String zipCode, String city) {
         this.uid = uid;
