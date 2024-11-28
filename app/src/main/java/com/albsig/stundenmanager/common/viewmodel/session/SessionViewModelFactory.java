@@ -1,11 +1,10 @@
 package com.albsig.stundenmanager.common.viewmodel.session;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
-import com.albsig.stundenmanager.domain.repository.UserRepository;
 
 public class SessionViewModelFactory implements ViewModelProvider.Factory {
 
