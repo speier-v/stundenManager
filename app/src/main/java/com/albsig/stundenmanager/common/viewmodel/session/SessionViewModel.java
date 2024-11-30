@@ -20,8 +20,8 @@ public class SessionViewModel extends ViewModel {
 
     private static final String TAG = "SessionViewModel";
     private final SessionRepository sessionRepository;
-    private final MutableLiveData<Result<List<SessionModel>>> sessionsResult = new MutableLiveData<>();
-    private final MutableLiveData<Result<SessionModel>> selectedSessionResult = new MutableLiveData<>();
+    private MutableLiveData<Result<List<SessionModel>>> sessionsResult = new MutableLiveData<>();
+    private MutableLiveData<Result<SessionModel>> selectedSessionResult = new MutableLiveData<>();
 
     public SessionViewModel(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
@@ -144,9 +144,11 @@ public class SessionViewModel extends ViewModel {
 
     public void removeSessionsSnapshot() {
         sessionRepository.removeSessionsSnapshotListener();
+        sessionsResult = new MutableLiveData<>();
     }
 
     public void removeSessionSnapshot() {
         sessionRepository.removeSessionSnapshotListener();
+        selectedSessionResult = new MutableLiveData<>();
     }
 }

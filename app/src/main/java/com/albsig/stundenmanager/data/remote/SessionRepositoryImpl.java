@@ -73,6 +73,7 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public void removeSessionsSnapshotListener() {
         sessionsSnapshotListener.remove();
+        sessionsSnapshotListener = null;
     }
 
     @Override
@@ -107,6 +108,7 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public void removeSessionSnapshotListener() {
         sessionSnapshotListener.remove();
+        sessionSnapshotListener = null;
     }
 
     @Override
