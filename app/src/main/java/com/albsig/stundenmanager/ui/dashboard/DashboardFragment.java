@@ -158,7 +158,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
 
             userModel = userModelResult.getValue();
             sessionsAdapter.setUid(userModel.getUid());
-            sessionViewModel.getSessions(userModel.getUid());
+            sessionViewModel.addSessionsSnapshot(userModel.getUid());
         });
 
         sessionViewModel.getSessions().observe(getViewLifecycleOwner(), sessionsResult -> {
@@ -176,6 +176,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         FloatingActionButton fabSignOut = binding.fabSignOut;
 
         fabSignOut.setOnClickListener(view -> {
+            sessionViewModel.removeSessionsSnapshot();
             userViewModel.signOutUser();
             Toast.makeText(this.binding.getRoot().getContext(), "Signed out successfully", Toast.LENGTH_SHORT).show();
             goToLoginFragment();
@@ -205,7 +206,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
 
     @Override
     public void onItemClick(String uid, SessionModel session) {
-        sessionViewModel.setSelectedSession(Result.success(session));
+        sessionViewModel.setSelectedSession(uid, session.getDocumentId());
         DetailTimeFragment newDetailTimeFragment = new DetailTimeFragment();
         FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME).addToBackStack(null);
         fragmentTransaction.commit();

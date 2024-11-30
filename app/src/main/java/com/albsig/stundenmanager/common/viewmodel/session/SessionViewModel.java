@@ -20,8 +20,8 @@ public class SessionViewModel extends ViewModel {
 
     private static final String TAG = "SessionViewModel";
     private final SessionRepository sessionRepository;
-    private final MutableLiveData<Result<List<SessionModel>>> sessionsResult = new MutableLiveData<>();
-    private final MutableLiveData<Result<SessionModel>> selectedSessionResult = new MutableLiveData<>();
+    private MutableLiveData<Result<List<SessionModel>>> sessionsResult = new MutableLiveData<>();
+    private MutableLiveData<Result<SessionModel>> selectedSessionResult = new MutableLiveData<>();
 
     public SessionViewModel(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
@@ -31,12 +31,41 @@ public class SessionViewModel extends ViewModel {
         return sessionsResult;
     }
 
-    public void setSelectedSession(Result<SessionModel> session) {
-        selectedSessionResult.setValue(session);
+    public void setSelectedSession(String uid, String documentId) {
+        sessionRepository.addSessionSnapshotListener(uid, documentId, new ResultCallback<SessionModel>() {
+
+            @Override
+            public void onSuccess(Result<SessionModel> response) {
+                selectedSessionResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<SessionModel> error) {
+                selectedSessionResult.setValue(error);
+            }
+        });
     }
 
     public LiveData<Result<SessionModel>> getSelectedSession() {
         return selectedSessionResult;
+    }
+
+    public void addSessionsSnapshot(String uid) {
+        sessionRepository.addSessionsSnapshotListener(uid, new ResultCallback<List<SessionModel>>() {
+            @Override
+            public void onSuccess(Result<List<SessionModel>> response) {
+                Log.d(TAG, "Add snapshot sessions successful");
+                for (SessionModel session : response.getValue()) {
+                    Log.d(TAG, "Session: " + session.toString());
+                }
+                sessionsResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<List<SessionModel>> error) {
+                sessionsResult.setValue(error);
+            }
+        });
     }
 
     public void getSessions(String uid) {
@@ -59,7 +88,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.deleteSession(uid, documentId, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -75,8 +103,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.createSession(sessionData, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                String uid = sessionData.optString("uid");
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -91,8 +117,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.createBreak(breakData, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                String uid = breakData.optString("uid");
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -108,7 +132,6 @@ public class SessionViewModel extends ViewModel {
 
             @Override
             public void onSuccess(Result<Boolean> response) {
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -117,5 +140,15 @@ public class SessionViewModel extends ViewModel {
                 resultCallback.onError(error);
             }
         });
+    }
+
+    public void removeSessionsSnapshot() {
+        sessionRepository.removeSessionsSnapshotListener();
+        sessionsResult = new MutableLiveData<>();
+    }
+
+    public void removeSessionSnapshot() {
+        sessionRepository.removeSessionSnapshotListener();
+        selectedSessionResult = new MutableLiveData<>();
     }
 }

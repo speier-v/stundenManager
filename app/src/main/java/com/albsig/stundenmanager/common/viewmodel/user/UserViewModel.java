@@ -44,6 +44,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public void signOutUser() {
+        Log.d(TAG, "Logout");
         userRepository.signOutUser(new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
