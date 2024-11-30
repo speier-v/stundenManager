@@ -39,6 +39,24 @@ public class SessionViewModel extends ViewModel {
         return selectedSessionResult;
     }
 
+    public void addSnapshotSessions(String uid) {
+        sessionRepository.addSessionsSnapshotListener(uid, new ResultCallback<List<SessionModel>>() {
+            @Override
+            public void onSuccess(Result<List<SessionModel>> response) {
+                Log.d(TAG, "Add snapshot sessions successful");
+                for (SessionModel session : response.getValue()) {
+                    Log.d(TAG, "Session: " + session.toString());
+                }
+                sessionsResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<List<SessionModel>> error) {
+                sessionsResult.setValue(error);
+            }
+        });
+    }
+
     public void getSessions(String uid) {
         sessionRepository.getSessions(uid, new ResultCallback<List<SessionModel>>() {
             @Override
@@ -75,8 +93,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.createSession(sessionData, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                String uid = sessionData.optString("uid");
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 

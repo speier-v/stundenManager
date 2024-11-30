@@ -41,30 +41,31 @@ public class SessionRepositoryImpl implements SessionRepository {
 
     @Override
     public void addSessionsSnapshotListener(String uid, ResultCallback<List<SessionModel>> resultCallback) {
-        sessionsSnapshotListener = firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.SESSIONS_COLLECTION).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException err) {
-                if (err != null) {
-                    Log.d(TAG, "Listen failed " + err.toString());
-                    return;
-                }
+        if (sessionsSnapshotListener != null) {
+            return;
+        }
 
-                if (queryDocumentSnapshots == null) {
-                    Log.d(TAG, "Collection is null");
-                    return;
-                }
-
-                List<SessionModel> sessionModels = new ArrayList<>();
-                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                    SessionModel sessionModel = document.toObject(SessionModel.class);
-                    assert sessionModel != null;
-                    sessionModel.setDocumentId(document.getId());
-                    sessionModels.add(sessionModel);
-                }
-
-                Log.d(TAG, "Collection data: " + queryDocumentSnapshots.getDocuments());
-                resultCallback.onSuccess(Result.success(sessionModels));
+        sessionsSnapshotListener = firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.SESSIONS_COLLECTION).addSnapshotListener( (queryDocumentSnapshots, err) -> {
+            if (err != null) {
+                Log.d(TAG, "Listen failed " + err.toString());
+                return;
             }
+
+            if (queryDocumentSnapshots == null) {
+                Log.d(TAG, "Collection is null");
+                return;
+            }
+
+            List<SessionModel> sessionModels = new ArrayList<>();
+            for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                SessionModel sessionModel = document.toObject(SessionModel.class);
+                assert sessionModel != null;
+                sessionModel.setDocumentId(document.getId());
+                sessionModels.add(sessionModel);
+            }
+
+            Log.d(TAG, "Collection data: " + queryDocumentSnapshots.getDocuments());
+            resultCallback.onSuccess(Result.success(sessionModels));
         });
     }
 

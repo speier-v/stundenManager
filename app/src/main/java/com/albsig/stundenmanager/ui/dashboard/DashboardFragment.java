@@ -158,7 +158,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
 
             userModel = userModelResult.getValue();
             sessionsAdapter.setUid(userModel.getUid());
-            sessionViewModel.getSessions(userModel.getUid());
+            sessionViewModel.addSnapshotSessions(userModel.getUid());
         });
 
         sessionViewModel.getSessions().observe(getViewLifecycleOwner(), sessionsResult -> {
