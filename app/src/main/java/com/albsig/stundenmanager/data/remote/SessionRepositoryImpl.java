@@ -42,6 +42,7 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public void addSessionsSnapshotListener(String uid, ResultCallback<List<SessionModel>> resultCallback) {
         if (sessionsSnapshotListener != null) {
+            Log.d(TAG, "Sessions snapshot listener already exists");
             return;
         }
 
@@ -76,6 +77,11 @@ public class SessionRepositoryImpl implements SessionRepository {
 
     @Override
     public void addSessionSnapshotListener(String uid, String documentId, ResultCallback<SessionModel> resultCallback) {
+        if (sessionSnapshotListener != null) {
+            Log.d(TAG, "Session snapshot listener already exists");
+            return;
+        }
+
         sessionSnapshotListener = firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.SESSIONS_COLLECTION).document(documentId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException err) {

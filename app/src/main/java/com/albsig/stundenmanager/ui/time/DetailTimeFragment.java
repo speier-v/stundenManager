@@ -116,20 +116,12 @@ public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreak
             userModel = result.getValue();
         });
 
-        sessionViewModel.getSessions().observe(getViewLifecycleOwner(), result -> {
-            if (!result.isSuccess()) {
-                Toast.makeText(mContext, "failed to get sessions" + result.getError(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-
-        });
-
         sessionViewModel.getSelectedSession().observe(getViewLifecycleOwner(), result -> {
             if (!result.isSuccess()) {
                 Toast.makeText(mContext, "failed to get session" + result.getError(), Toast.LENGTH_SHORT).show();
                 return;
             }
+
             sessionModel = result.getValue();
             setDateTime(sessionModel);
 
@@ -195,5 +187,12 @@ public class DetailTimeFragment extends Fragment implements BreakAdapter.OnBreak
             startProcessBreak();
         });
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        sessionViewModel.removeSessionSnapshot();
     }
 }

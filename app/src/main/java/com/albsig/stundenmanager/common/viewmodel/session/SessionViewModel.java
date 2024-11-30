@@ -31,15 +31,26 @@ public class SessionViewModel extends ViewModel {
         return sessionsResult;
     }
 
-    public void setSelectedSession(Result<SessionModel> session) {
-        selectedSessionResult.setValue(session);
+    public void setSelectedSession(String uid, String documentId) {
+        sessionRepository.addSessionSnapshotListener(uid, documentId, new ResultCallback<SessionModel>() {
+
+            @Override
+            public void onSuccess(Result<SessionModel> response) {
+                selectedSessionResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<SessionModel> error) {
+                selectedSessionResult.setValue(error);
+            }
+        });
     }
 
     public LiveData<Result<SessionModel>> getSelectedSession() {
         return selectedSessionResult;
     }
 
-    public void addSnapshotSessions(String uid) {
+    public void addSessionsSnapshot(String uid) {
         sessionRepository.addSessionsSnapshotListener(uid, new ResultCallback<List<SessionModel>>() {
             @Override
             public void onSuccess(Result<List<SessionModel>> response) {
@@ -77,7 +88,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.deleteSession(uid, documentId, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -107,8 +117,6 @@ public class SessionViewModel extends ViewModel {
         sessionRepository.createBreak(breakData, new ResultCallback<Boolean>() {
             @Override
             public void onSuccess(Result<Boolean> response) {
-                String uid = breakData.optString("uid");
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -124,7 +132,6 @@ public class SessionViewModel extends ViewModel {
 
             @Override
             public void onSuccess(Result<Boolean> response) {
-                getSessions(uid);
                 resultCallback.onSuccess(response);
             }
 
@@ -133,5 +140,13 @@ public class SessionViewModel extends ViewModel {
                 resultCallback.onError(error);
             }
         });
+    }
+
+    public void removeSessionsSnapshot() {
+        sessionRepository.removeSessionsSnapshotListener();
+    }
+
+    public void removeSessionSnapshot() {
+        sessionRepository.removeSessionSnapshotListener();
     }
 }
