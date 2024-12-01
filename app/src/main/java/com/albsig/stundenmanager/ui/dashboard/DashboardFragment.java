@@ -45,8 +45,6 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     private Context mContext;
     private FragmentDashboardBinding binding;
     private SessionsAdapter sessionsAdapter;
-    private FirebaseFirestore db;
-    private FirestoreUtil firestoreUtil;
     private UserViewModel userViewModel;
     private SessionViewModel sessionViewModel;
     private UserModel userModel;
@@ -57,8 +55,6 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
-        firestoreUtil = new FirestoreUtil();
-        db = firestoreUtil.getInstance();
     }
 
     @Override

@@ -27,4 +27,12 @@
     <string name="sessions">Sessions</string>
     <string name="details">Details</string>
     <string name="breaks">Pausen</string>
+    <string name="to_admin">to admin</string>
+    <string name="to_user">to user</string>
+    <string name="admin">Admin</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="statistics">Statistiken</string>
+    <string name="home">Home</string>
+    <string name="shiftPlanning">Shichtplanung</string>
+    <string name="workerPlanning">Mitarbeiter-Verwaltung</string>
 </resources>

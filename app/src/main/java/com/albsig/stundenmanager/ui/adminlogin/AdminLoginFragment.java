@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.ui.login;
+package com.albsig.stundenmanager.ui.adminlogin;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,23 +17,22 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.Helpers;
-import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
+import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
+import com.albsig.stundenmanager.databinding.FragmentAdminLoginBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
-import com.albsig.stundenmanager.ui.adminlogin.AdminLoginFragment;
-import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
-import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
-import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
+import com.albsig.stundenmanager.ui.admindashboard.AdminDashboardFragment;
+import com.albsig.stundenmanager.ui.login.LoginFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginFragment extends Fragment {
+public class AdminLoginFragment extends Fragment {
 
-    private static final String TAG = "LoginFragment";
-    private FragmentLoginBinding binding;
+    private static final String TAG = "AdminLoginFragment";
+    private FragmentAdminLoginBinding binding;
     private FragmentTransaction fragmentTransaction;
     private Context mContext;
-    private UserViewModel userViewModel;
+    private AdminViewModel adminViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -44,14 +43,14 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        adminViewModel = new ViewModelProvider(requireActivity()).get(AdminViewModel.class);
     }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        binding = FragmentAdminLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -68,12 +67,11 @@ public class LoginFragment extends Fragment {
         assert binding != null;
         initObserver();
         binding.btnLogin.setOnClickListener(v -> onLoginButtonClicked());
-        binding.btnGoToRegistration.setOnClickListener(v -> goToRegistration());
-        binding.btnToAdmin.setOnClickListener( v -> goToAdminLogin());
+        binding.btnToUser.setOnClickListener(v -> goToUserLogin());
     }
 
     private void initObserver() {
-        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+        adminViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
             if (!userModelResult.isSuccess()) {
                 Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
                 return;
@@ -81,19 +79,19 @@ public class LoginFragment extends Fragment {
 
             UserModel userModel = userModelResult.getValue();
             if (userModel.getUid() == null) {
-                Log.d(TAG, "UserModel uid is null");
+                Log.d(TAG, "Admin-UserModel uid is null");
                 return;
             }
 
-            Toast.makeText(mContext, "Login Successful", Toast.LENGTH_SHORT).show();
-            goToDashboard();
+            Toast.makeText(mContext, "Admin-Login Successful", Toast.LENGTH_SHORT).show();
+            goToAdminDashboard();
         });
     }
 
-    private void goToDashboard() {
-        DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+    private void goToAdminDashboard() {
+        AdminDashboardFragment adminDashboardFragment = new AdminDashboardFragment();
 
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, adminDashboardFragment, Constants.TAG_ADMIN_DASHBOARD);
         fragmentTransaction.commit();
     }
 
@@ -120,20 +118,13 @@ public class LoginFragment extends Fragment {
             throw new RuntimeException(e);
         }
 
-        userViewModel.loginUser(userData);
+        adminViewModel.loginAdmin(userData);
     }
 
-    private void goToRegistration() {
-        RegistrationFragment newRegistrationFragment = new RegistrationFragment();
+    private void goToUserLogin() {
+        LoginFragment loginFragment = new LoginFragment();
 
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
-        fragmentTransaction.commit();
-    }
-
-    private void goToAdminLogin() {
-        AdminLoginFragment newAdminLoginFragment = new AdminLoginFragment();
-
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newAdminLoginFragment, Constants.TAG_ADMIN_LOGIN);
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, loginFragment, Constants.TAG_LOGIN);
         fragmentTransaction.commit();
     }
 }

@@ -14,11 +14,12 @@ public class UserModel {
     private String street;
     private String zipCode;
     private String city;
+    private String role;
 
     public UserModel() {
     }
 
-    public UserModel(String uid, String email, String name, String surname, String date, String street, String zipCode, String city) {
+    public UserModel(String uid, String email, String name, String surname, String date, String street, String zipCode, String city, String role) {
         this.uid = uid;
         this.email = email;
         this.name = name;
@@ -27,6 +28,7 @@ public class UserModel {
         this.street = street;
         this.zipCode = zipCode;
         this.city = city;
+        this.role = role;
     }
 
     public UserModel(String uid, String email, DocumentSnapshot documentSnapshot) {
@@ -38,6 +40,7 @@ public class UserModel {
         this.street = documentSnapshot.getString(Constants.USER_MODEL_STREET);
         this.zipCode = documentSnapshot.getString(Constants.USER_MODEL_ZIP_CODE);
         this.city = documentSnapshot.getString(Constants.USER_MODEL_CITY);
+        this.role = documentSnapshot.getString(Constants.USER_MODEL_ROLE);
     }
 
     public UserModel(Map<String, Object> userMap) {
@@ -49,6 +52,7 @@ public class UserModel {
         this.street = (String) userMap.get(Constants.USER_MODEL_STREET);
         this.zipCode = (String) userMap.get(Constants.USER_MODEL_ZIP_CODE);
         this.city = (String) userMap.get(Constants.USER_MODEL_CITY);
+        this.role = (String) userMap.get(Constants.USER_MODEL_ROLE);
     }
 
     public String getUid() {
@@ -81,5 +85,9 @@ public class UserModel {
 
     public String getCity() {
         return city;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:id="@+id/tvHello"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnSignOut"
+        android:text="@string/home"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:id="@+id/btnSignOut"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        app:icon="@drawable/ic_sign_out"
+        app:iconTint="@color/common_google_signin_btn_text_light_default"
+        app:iconSize="24dp"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ShapeAppearanceOverlay.Material3.Button"
+        android:id="@+id/btnStatistics"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintBottom_toTopOf="@id/gl_mid"
+        android:layout_marginHorizontal="32dp"
+        android:text="@string/statistics"
+        android:textAllCaps="true"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ShapeAppearanceOverlay.Material3.Button"
+        android:id="@+id/btnShiftPlanning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/btnStatistics"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/shiftPlanning"
+        android:textAllCaps="true"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ShapeAppearanceOverlay.Material3.Button"
+        android:id="@+id/btnWorkerPlaning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/btnShiftPlanning"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/workerPlanning"
+        android:textAllCaps="true"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_start"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_end"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:id="@+id/gl_mid"
+        app:layout_constraintGuide_percent=".5"
+        android:orientation="horizontal"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

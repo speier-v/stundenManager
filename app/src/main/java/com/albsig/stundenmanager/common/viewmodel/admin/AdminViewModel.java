@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.common.viewmodel.user;
+package com.albsig.stundenmanager.common.viewmodel.admin;
 
 import android.util.Log;
 
@@ -9,17 +9,20 @@ import androidx.lifecycle.ViewModel;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.repository.AdminRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 
 import org.json.JSONObject;
 
-public class UserViewModel extends ViewModel {
+public class AdminViewModel extends ViewModel {
 
     private static final String TAG = "UserViewModel";
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private MutableLiveData<Result<UserModel>> userModelResult = new MutableLiveData<>();
 
-    public UserViewModel(UserRepository userRepository) {
+    public AdminViewModel(AdminRepository adminRepository, UserRepository userRepository) {
+        this.adminRepository = adminRepository;
         this.userRepository = userRepository;
     }
 
@@ -27,8 +30,8 @@ public class UserViewModel extends ViewModel {
         return userModelResult;
     }
 
-    public void loginUser(JSONObject userData) {
-        userRepository.loginUser(userData, new ResultCallback<UserModel>() {
+    public void loginAdmin(JSONObject userData) {
+        adminRepository.loginAdmin(userData, new ResultCallback<UserModel>() {
             @Override
             public void onSuccess(Result<UserModel> response) {
                 Log.d(TAG, "Login successful");
@@ -43,7 +46,7 @@ public class UserViewModel extends ViewModel {
         });
     }
 
-    public void signOutUser() {
+    public void signOutAdmin() {
         Log.d(TAG, "Logout");
         userRepository.signOutUser(new ResultCallback<Boolean>() {
             @Override
@@ -56,23 +59,6 @@ public class UserViewModel extends ViewModel {
             public void onError(Result<Boolean> error) {
                 Log.d(TAG, "Logout did not work. Try again later!");
             }
-        });
-    }
-
-    public void registerUser(JSONObject userData) {
-        userRepository.registerUser(userData, new ResultCallback<UserModel>() {
-
-            @Override
-            public void onSuccess(Result<UserModel> response) {
-                Log.d(TAG, "Registration successful");
-                userModelResult.setValue(response);
-            }
-
-            @Override
-            public void onError(Result<UserModel> error) {
-                Log.d(TAG, "Registration failed ");
-            }
-
         });
     }
 }
