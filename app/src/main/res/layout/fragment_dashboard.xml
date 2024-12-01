@@ -4,14 +4,48 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.AppCompat.Display2"
+        android:id="@+id/tvHello"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/hello_dashboard"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/titleUserName"
+        app:layout_constraintStart_toEndOf="@id/tvHello"
+        app:layout_constraintBottom_toBottomOf="@id/tvHello"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/name"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleLarge"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/title_sessions"
+        android:text="@string/sessions"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/tvHello"
+        android:layout_marginTop="32dp"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSessions"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="@id/gl_start"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_sessions"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

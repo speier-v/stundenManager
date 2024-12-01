@@ -157,6 +157,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
             }
 
             userModel = userModelResult.getValue();
+            binding.titleUserName.setText(userModel.getSurname());
             sessionsAdapter.setUid(userModel.getUid());
             sessionViewModel.addSessionsSnapshot(userModel.getUid());
         });
