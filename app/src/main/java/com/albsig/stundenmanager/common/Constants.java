@@ -4,6 +4,9 @@ public class Constants {
     public static final String TAG_LOGIN = "Login";
     public static final String TAG_DASHBOARD = "Dashboard";
     public static final String TAG_DETAIL_TIME = "DetailTime";
+    public static final String TAG_DETAIL_BREAK = "DetailBreak";
+    public static final String TAG_REGISTRATION = "Registration";
+    public static final String TAG_ADMIN_LOGIN = "AdminLogin";
 
     public static final String USER_MODEL_ID = "uid";
     public static final String USER_MODEL_EMAIL = "email";

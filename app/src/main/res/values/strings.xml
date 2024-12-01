@@ -27,4 +27,6 @@
     <string name="sessions">Sessions</string>
     <string name="details">Details</string>
     <string name="breaks">Pausen</string>
+    <string name="to_admin">to admin</string>
+    <string name="to_user">to user</string>
 </resources>

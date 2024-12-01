@@ -1,4 +1,4 @@
-package com.albsig.stundenmanager.ui.login;
+package com.albsig.stundenmanager.ui.adminlogin;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,19 +18,20 @@ import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.Helpers;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
-import com.albsig.stundenmanager.domain.model.UserModel;
-import com.albsig.stundenmanager.ui.adminlogin.AdminLoginFragment;
-import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.databinding.FragmentAdminLoginBinding;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
+import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginFragment extends Fragment {
+public class AdminLoginFragment extends Fragment {
 
-    private static final String TAG = "LoginFragment";
-    private FragmentLoginBinding binding;
+    private static final String TAG = "AdminLoginFragment";
+    private FragmentAdminLoginBinding binding;
     private FragmentTransaction fragmentTransaction;
     private Context mContext;
     private UserViewModel userViewModel;
@@ -51,7 +52,7 @@ public class LoginFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        binding = FragmentAdminLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -68,8 +69,7 @@ public class LoginFragment extends Fragment {
         assert binding != null;
         initObserver();
         binding.btnLogin.setOnClickListener(v -> onLoginButtonClicked());
-        binding.btnGoToRegistration.setOnClickListener(v -> goToRegistration());
-        binding.btnToAdmin.setOnClickListener( v -> goToAdminLogin());
+        binding.btnToUser.setOnClickListener(v -> goToUserLogin());
     }
 
     private void initObserver() {
@@ -123,17 +123,10 @@ public class LoginFragment extends Fragment {
         userViewModel.loginUser(userData);
     }
 
-    private void goToRegistration() {
-        RegistrationFragment newRegistrationFragment = new RegistrationFragment();
+    private void goToUserLogin() {
+        LoginFragment loginFragment = new LoginFragment();
 
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newRegistrationFragment, Constants.TAG_LOGIN);
-        fragmentTransaction.commit();
-    }
-
-    private void goToAdminLogin() {
-        AdminLoginFragment newAdminLoginFragment = new AdminLoginFragment();
-
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newAdminLoginFragment, Constants.TAG_ADMIN_LOGIN);
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, loginFragment, Constants.TAG_LOGIN);
         fragmentTransaction.commit();
     }
 }
