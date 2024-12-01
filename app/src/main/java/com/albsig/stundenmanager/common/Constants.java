@@ -7,6 +7,7 @@ public class Constants {
     public static final String TAG_DETAIL_BREAK = "DetailBreak";
     public static final String TAG_REGISTRATION = "Registration";
     public static final String TAG_ADMIN_LOGIN = "AdminLogin";
+    public static String TAG_ADMIN_DASHBOARD = "AdminDashboard";
 
     public static final String USER_MODEL_ID = "uid";
     public static final String USER_MODEL_EMAIL = "email";
@@ -17,6 +18,7 @@ public class Constants {
     public static final String USER_MODEL_CITY = "city";
     public static final String USER_MODEL_NAME = "name";
     public static final String USER_MODEL_SURNAME = "surname";
+    public static final String USER_MODEL_ROLE = "role";
     public static final String USERS_COLLECTION = "users";
     public static final String SESSIONS_COLLECTION = "sessions";
 
@@ -32,7 +34,6 @@ public class Constants {
     public static final String HTTP_CALLABLE_REF_CREATE_BREAK = "createBreak";
     public static final String FORMATTED_DATE_PATTERN = "dd.MM.yyyy HH:mm";
 
-    public static final String USER_MODEL_ROLE = "role";
     public static final String HTTP_CALLABLE_REF_LOGIN_ADMIN = "loginAdmin";
     public static final String ROLE_ADMIN = "admin";
     public static final String ROLE_USER = "user";

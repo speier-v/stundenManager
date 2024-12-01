@@ -20,7 +20,7 @@ import com.albsig.stundenmanager.common.Helpers;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminLoginBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
-import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.ui.admindashboard.AdminDashboardFragment;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 
 import org.json.JSONException;
@@ -84,14 +84,14 @@ public class AdminLoginFragment extends Fragment {
             }
 
             Toast.makeText(mContext, "Admin-Login Successful", Toast.LENGTH_SHORT).show();
-//            goToDashboard();
+            goToAdminDashboard();
         });
     }
 
-    private void goToDashboard() {
-        DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+    private void goToAdminDashboard() {
+        AdminDashboardFragment adminDashboardFragment = new AdminDashboardFragment();
 
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, adminDashboardFragment, Constants.TAG_ADMIN_DASHBOARD);
         fragmentTransaction.commit();
     }
 

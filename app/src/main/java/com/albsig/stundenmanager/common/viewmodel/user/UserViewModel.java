@@ -17,7 +17,7 @@ public class UserViewModel extends ViewModel {
 
     private static final String TAG = "UserViewModel";
     private final UserRepository userRepository;
-    private final MutableLiveData<Result<UserModel>> userModelResult = new MutableLiveData<>();
+    private MutableLiveData<Result<UserModel>> userModelResult = new MutableLiveData<>();
 
     public UserViewModel(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -49,7 +49,7 @@ public class UserViewModel extends ViewModel {
             @Override
             public void onSuccess(Result<Boolean> response) {
                 Log.d(TAG, "Logout successful");
-                userModelResult.setValue(Result.success(new UserModel()));
+                userModelResult = new MutableLiveData<>();
             }
 
             @Override
