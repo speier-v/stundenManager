@@ -2,8 +2,6 @@ package com.albsig.stundenmanager.data.remote;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +9,7 @@ import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.repository.AdminRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,52 +24,20 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class UserRepositoryImpl implements UserRepository {
+public class AdminRepositoryImpl implements AdminRepository {
 
-    private static final String TAG = "UserRepositoryImpl";
     private final Context context;
     private final FirebaseFirestore firebaseFirestore;
     private final FirebaseAuth firebaseAuth;
-    private final FirebaseFunctions firebaseFunctions;
 
-    public UserRepositoryImpl(Context context) {
-        this.context = context;
+    public AdminRepositoryImpl(Context context) {
         this.firebaseAuth = FirebaseAuth.getInstance();
-        this.firebaseFunctions = FirebaseFunctions.getInstance();
         this.firebaseFirestore = FirebaseFirestore.getInstance();
+        this.context = context;
     }
 
     @Override
-    public void registerUser(JSONObject userData, ResultCallback<UserModel> resultCallback) {
-        Log.d(TAG, "registerUser: " + userData);
-        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_USER).call(userData).addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                Exception e = task.getException();
-                assert e != null;
-                resultCallback.onError(Result.error(new Exception("Process could not be made " + e)));
-                return;
-            }
-
-            Object result = task.getResult().getData();
-            if (result == null) {
-                resultCallback.onError(Result.error(new Exception("User not found")));
-                return;
-            }
-
-            Map<String, Object> userMap = (Map<String, Object>) result;
-            UserModel userModel = new UserModel(userMap);
-            resultCallback.onSuccess(Result.success(userModel));
-
-        });
-    }
-
-    @Override
-    public void updateUser(JSONObject userData, ResultCallback<UserModel> resultCallback) {
-
-    }
-
-    @Override
-    public void loginUser(JSONObject userData, ResultCallback<UserModel> resultCallback) {
+    public void loginAdmin(JSONObject userData, ResultCallback<UserModel> resultCallback) {
         String eMail;
         String password;
 
@@ -90,6 +57,7 @@ public class UserRepositoryImpl implements UserRepository {
                     if (user == null) {
                         return;
                     }
+
                     firebaseFirestore.collection(Constants.USERS_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task1 -> {
                         if (!task1.isSuccessful()) {
                             resultCallback.onError(Result.error(task1.getException()));
@@ -103,6 +71,12 @@ public class UserRepositoryImpl implements UserRepository {
                         }
 
                         UserModel userModel = new UserModel(user.getUid(), user.getEmail(), documentSnapshot);
+                        if (!userModel.getRole().equals(Constants.ROLE_ADMIN)) {
+                            firebaseAuth.signOut();
+                            resultCallback.onError(Result.error(new Exception("User is not an admin")));
+                            return;
+                        }
+
                         resultCallback.onSuccess(Result.success(userModel));
                     });
                 }
@@ -110,11 +84,5 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (Exception e) {
             resultCallback.onError(Result.error(e));
         }
-    }
-
-    @Override
-    public void signOutUser(ResultCallback<Boolean> resultCallback) {
-        firebaseAuth.signOut();
-        resultCallback.onSuccess(Result.success(true));
     }
 }

@@ -17,13 +17,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.Helpers;
-import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
+import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminLoginBinding;
-import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
-import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +32,7 @@ public class AdminLoginFragment extends Fragment {
     private FragmentAdminLoginBinding binding;
     private FragmentTransaction fragmentTransaction;
     private Context mContext;
-    private UserViewModel userViewModel;
+    private AdminViewModel adminViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -45,7 +43,7 @@ public class AdminLoginFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        adminViewModel = new ViewModelProvider(requireActivity()).get(AdminViewModel.class);
     }
 
 
@@ -73,7 +71,7 @@ public class AdminLoginFragment extends Fragment {
     }
 
     private void initObserver() {
-        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+        adminViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
             if (!userModelResult.isSuccess()) {
                 Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
                 return;
@@ -81,12 +79,12 @@ public class AdminLoginFragment extends Fragment {
 
             UserModel userModel = userModelResult.getValue();
             if (userModel.getUid() == null) {
-                Log.d(TAG, "UserModel uid is null");
+                Log.d(TAG, "Admin-UserModel uid is null");
                 return;
             }
 
-            Toast.makeText(mContext, "Login Successful", Toast.LENGTH_SHORT).show();
-            goToDashboard();
+            Toast.makeText(mContext, "Admin-Login Successful", Toast.LENGTH_SHORT).show();
+//            goToDashboard();
         });
     }
 
@@ -120,7 +118,7 @@ public class AdminLoginFragment extends Fragment {
             throw new RuntimeException(e);
         }
 
-        userViewModel.loginUser(userData);
+        adminViewModel.loginAdmin(userData);
     }
 
     private void goToUserLogin() {

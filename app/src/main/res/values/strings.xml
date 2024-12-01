@@ -29,4 +29,5 @@
     <string name="breaks">Pausen</string>
     <string name="to_admin">to admin</string>
     <string name="to_user">to user</string>
+    <string name="admin">Admin</string>
 </resources>
