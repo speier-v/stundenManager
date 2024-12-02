@@ -35,4 +35,5 @@
     <string name="home">Home</string>
     <string name="shiftPlanning">Shichtplanung</string>
     <string name="workerPlanning">Mitarbeiter-Verwaltung</string>
+    <string name="vacation_planning">vacation planning</string>
 </resources>

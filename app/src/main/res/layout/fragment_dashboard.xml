@@ -26,6 +26,23 @@
         android:text="@string/name"
         />
 
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:id="@+id/btnSignOut"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        app:icon="@drawable/ic_sign_out"
+        app:iconTint="@color/common_google_signin_btn_text_light_default"
+        app:iconSize="24dp"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"/>
+
     <com.google.android.material.textview.MaterialTextView
         style="@style/TextAppearance.Material3.TitleLarge"
         android:layout_width="0dp"
@@ -48,27 +65,39 @@
         android:layout_marginTop="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddSession"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_new_session"
-        android:src="@drawable/ic_plus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
         android:layout_marginBottom="16dp"
-        app:backgroundTint="@color/cardview_light_background"/>
+        app:icon="@drawable/ic_plus"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSignOut"
+        android:id="@+id/fabVacation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/sign_out"
-        android:src="@drawable/ic_sign_out"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/gl_start"
-        android:layout_marginBottom="16dp"
-        app:backgroundTint="@color/cardview_light_background"/>
+        android:contentDescription="@string/vacation_planning"
+        app:layout_constraintBottom_toTopOf="@id/fabAddSession"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:src="@drawable/ic_vacation"
+        android:layout_marginBottom="16dp"/>
+
+<!--    <com.google.android.material.textview.MaterialTextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"/>-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabIllness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/vacation_planning"
+        app:layout_constraintBottom_toTopOf="@id/fabVacation"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:src="@drawable/ic_pharmacy"
+        android:layout_marginBottom="16dp"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"

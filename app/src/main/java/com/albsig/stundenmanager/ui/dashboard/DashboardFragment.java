@@ -28,6 +28,8 @@ import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.time.DetailTimeFragment;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -97,7 +99,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     }
 
     private void setAddSessionButton() {
-        FloatingActionButton fabAddSession = binding.fabAddSession;
+        MaterialButton fabAddSession = binding.fabAddSession;
         fabAddSession.setOnClickListener(v -> {
             startCreateSession();
         });
@@ -170,9 +172,9 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
     }
 
     private void signOut() {
-        FloatingActionButton fabSignOut = binding.fabSignOut;
+        MaterialButton btnSignOut = binding.btnSignOut;
 
-        fabSignOut.setOnClickListener(view -> {
+        btnSignOut.setOnClickListener(view -> {
             sessionViewModel.removeSessionsSnapshot();
             userViewModel.signOutUser();
             Toast.makeText(this.binding.getRoot().getContext(), "Signed out successfully", Toast.LENGTH_SHORT).show();
