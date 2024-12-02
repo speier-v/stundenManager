@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    //id("com.android.application") version "8.7.0" apply false
+    //id("com.android.library") version "8.7.0" apply false
+    //id("org.jetbrains.kotlin.android") version "2.0.20" apply false
     id("com.google.gms.google-services")
 }
 
@@ -10,6 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.albsig.stundenmanager"
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -20,7 +24,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-	    crunchPngs false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -47,6 +50,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.support.annotations)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
