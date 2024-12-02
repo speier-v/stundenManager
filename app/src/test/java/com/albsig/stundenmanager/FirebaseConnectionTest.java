@@ -51,7 +51,7 @@ public class FirebaseConnectionTest {
             }
         });
 
-        
+
         assertEquals("testValue", result[0]);
     }
 }

@@ -37,6 +37,8 @@ navigation-fragment = { group = "androidx.navigation", name = "navigation-fragme
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 support-annotations = { group = "com.android.support", name = "support-annotations", version.ref = "supportAnnotations" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+mockito-core = "org.mockito:mockito-core:4.2.0"
+androidx-test-core = "androidx.test:core:1.6.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
