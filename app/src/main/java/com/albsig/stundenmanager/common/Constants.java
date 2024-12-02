@@ -7,6 +7,7 @@ public class Constants {
     public static final String TAG_DETAIL_BREAK = "DetailBreak";
     public static final String TAG_REGISTRATION = "Registration";
     public static final String TAG_ADMIN_LOGIN = "AdminLogin";
+    public static final String TAG_SHIFT_PLANNER = "ShiftPlanner";
     public static String TAG_ADMIN_DASHBOARD = "AdminDashboard";
 
     public static final String USER_MODEL_ID = "uid";

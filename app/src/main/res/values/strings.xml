@@ -35,4 +35,12 @@
     <string name="home">Home</string>
     <string name="shiftPlanning">Shichtplanung</string>
     <string name="workerPlanning">Mitarbeiter-Verwaltung</string>
+    <string name="shiftPlaner">Schichtplaner</string>
+    <string name="week">Week</string>
+    <string name="spacer">...</string>
+    <string name="morningShift">Frühschicht</string>
+    <string name="pick">Auswählen</string>
+    <string name="lateShift">Spätschicht</string>
+    <string name="nightShift">Nachtschicht</string>
+    <string name="create">Erstellen</string>
 </resources>
