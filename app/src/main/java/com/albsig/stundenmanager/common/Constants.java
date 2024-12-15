@@ -21,6 +21,7 @@ public class Constants {
     public static final String USER_MODEL_ROLE = "role";
     public static final String USERS_COLLECTION = "users";
     public static final String SESSIONS_COLLECTION = "sessions";
+    public static final String ASSIGNED_SESSIONS_COLLECTION = "shifts";
 
     public static final String HTTP_CALLABLE_REF_CREATE_USER = "createUser";
 
