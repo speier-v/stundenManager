@@ -1,5 +1,6 @@
 package com.albsig.stundenmanager.ui.shifts;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,16 +9,28 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
-import com.albsig.stundenmanager.domain.model.session.Shift;
+import com.albsig.stundenmanager.domain.model.session.ShiftModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHolder> {
 
-    private List<Shift> shiftList;
+    private List<ShiftModel> shiftList;
 
-    public ShiftAdapter(List<Shift> shiftList) {
+    public ShiftAdapter() {
+        this.shiftList = new ArrayList<ShiftModel>();
+    }
+
+    public ShiftAdapter(List<ShiftModel> shiftList) {
         this.shiftList = shiftList;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<ShiftModel> newShiftDates) {
+        shiftList.clear();
+        shiftList.addAll(newShiftDates);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -30,7 +43,7 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ShiftViewHolder holder, int position) {
-        Shift shift = shiftList.get(position);
+        ShiftModel shift = shiftList.get(position);
 
         holder.shiftTypeTextView.setText(shift.getShiftType());
         holder.startDateTextView.setText(shift.getStartDate());

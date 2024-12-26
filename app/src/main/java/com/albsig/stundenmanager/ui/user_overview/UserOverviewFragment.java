@@ -27,7 +27,6 @@ import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.databinding.FragmentUserOverviewBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
-import com.albsig.stundenmanager.ui.assigned_sessions.AssignedSessionsFragment;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.ui.dashboard.SessionsAdapter;
 import com.albsig.stundenmanager.ui.login.LoginFragment;

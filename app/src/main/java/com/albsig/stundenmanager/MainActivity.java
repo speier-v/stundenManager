@@ -12,13 +12,17 @@ import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModelFactory;
 import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
 import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModelFactory;
+import com.albsig.stundenmanager.common.viewmodel.shift.ShiftViewModel;
+import com.albsig.stundenmanager.common.viewmodel.shift.ShiftViewModelFactory;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModelFactory;
 import com.albsig.stundenmanager.data.remote.AdminRepositoryImpl;
 import com.albsig.stundenmanager.data.remote.SessionRepositoryImpl;
+import com.albsig.stundenmanager.data.remote.ShiftRepositoryImpl;
 import com.albsig.stundenmanager.data.remote.UserRepositoryImpl;
 import com.albsig.stundenmanager.domain.repository.AdminRepository;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
+import com.albsig.stundenmanager.domain.repository.ShiftRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.albsig.stundenmanager.databinding.ActivityMainBinding;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
@@ -49,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         SessionRepository sessionRepository = new SessionRepositoryImpl();
         SessionViewModelFactory sessionViewModelFactory = new SessionViewModelFactory(sessionRepository);
         new ViewModelProvider(this, sessionViewModelFactory).get(SessionViewModel.class);
+
+        ShiftRepository shiftRepository = new ShiftRepositoryImpl();
+        ShiftViewModelFactory shiftViewModelFactory = new ShiftViewModelFactory(shiftRepository);
+        new ViewModelProvider(this, shiftViewModelFactory).get(ShiftViewModel.class);
     }
 
     private void initLogin() {

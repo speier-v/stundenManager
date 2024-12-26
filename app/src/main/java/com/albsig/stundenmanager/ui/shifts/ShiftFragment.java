@@ -21,25 +21,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
+import com.albsig.stundenmanager.common.viewmodel.shift.ShiftViewModel;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentShiftsBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
-import com.albsig.stundenmanager.domain.model.session.Shift;
+import com.albsig.stundenmanager.domain.model.session.ShiftModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.user_overview.UserOverviewFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ShiftFragment extends Fragment {
 
@@ -48,9 +42,11 @@ public class ShiftFragment extends Fragment {
     private FragmentShiftsBinding binding;
     private UserViewModel userViewModel;
     private UserModel userModel;
+    private ShiftViewModel shiftViewModel;
+    private ShiftModel shiftModel;
     private RecyclerView recyclerView;
     private ShiftAdapter shiftAdapter;
-    private List<Shift> shiftList = new ArrayList<>();
+    private List<ShiftModel> shiftList = new ArrayList<>();
 
 
     @Override
@@ -63,6 +59,7 @@ public class ShiftFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        shiftViewModel = new ViewModelProvider(requireActivity()).get(ShiftViewModel.class);
     }
 
     @Nullable
@@ -70,16 +67,59 @@ public class ShiftFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentShiftsBinding.inflate(inflater, container, false);
 
+        /*
         binding.recyclerShifts.setLayoutManager(new LinearLayoutManager(getContext()));
         shiftAdapter = new ShiftAdapter(shiftList);
+        binding.recyclerShifts.setAdapter(shiftAdapter);
+         */
+        shiftAdapter = new ShiftAdapter();
         binding.recyclerShifts.setAdapter(shiftAdapter);
 
         return binding.getRoot();
     }
 
-    private void fetchShifts(String userUid) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initObserver();
+        signOut();
+        navigateBack();
+    }
+
+    private void initObserver() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+            if (!userModelResult.isSuccess()) {
+                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            userModel = userModelResult.getValue();
+        });
+
+        shiftViewModel.getShifts().observe(getViewLifecycleOwner(), shiftResult -> {
+            if (!shiftResult.isSuccess()) {
+                Toast.makeText(mContext, "Shifts not found - " + shiftResult.getError(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            List<ShiftModel> shiftsList = shiftResult.getValue();
+            Log.d(TAG, "Found the following shifts: "+shiftsList);
+            fetchShifts(shiftsList);
+        });
+    }
+
+    private void fetchShifts(List<ShiftModel> shifts) {
+        //FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        shiftAdapter.updateData(shifts);
+
+        /*
         db.collection("shifts").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -127,63 +167,10 @@ public class ShiftFragment extends Fragment {
 
                 Log.d(TAG, ""+shiftAdapter.getItemCount());
             } else {
-               Log.d(TAG, "Couldn't fetch shifts");
-           }
-        });
-    }
-
-    private boolean isUserInShift(List<DocumentReference> shiftList, String userUid) {
-        if (shiftList == null) return false;
-
-        for (DocumentReference userRef : shiftList) {
-            if (userRef != null && userRef.getId().equals(userUid)) {
-                return true;
+                Log.d(TAG, "Couldn't fetch shifts");
             }
-        }
-        return false;
-    }
-
-    private Date addHoursToDate(Date date, int hours) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, hours);
-        return calendar.getTime();
-    }
-
-    private Date subtractHoursFromDate(Date date, int hours) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, -hours);
-        return calendar.getTime();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initObserver();
-        signOut();
-        navigateBack();
-    }
-
-    private void initObserver() {
-        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
-            if (!userModelResult.isSuccess()) {
-                Toast.makeText(mContext, "Login failed - " + userModelResult.getError(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            userModel = userModelResult.getValue();
-
-            //String userUid = "VKePkgvLOpSbtkO3717h8rXMYTx2"; // Replace with actual UID
-            //Log.d(TAG, "Calling with userUid "+userUid);
-            fetchShifts(userModel.getUid());
         });
+         */
     }
 
     private void signOut() {
