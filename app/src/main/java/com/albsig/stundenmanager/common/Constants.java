@@ -22,8 +22,10 @@ public class Constants {
     public static final String USER_MODEL_ROLE = "role";
     public static final String USERS_COLLECTION = "users";
     public static final String SESSIONS_COLLECTION = "sessions";
+    public static final String SHIFTS_COLLECTION = "shifts";
 
     public static final String HTTP_CALLABLE_REF_CREATE_USER = "createUser";
+    public static final String HTTP_CALLABLE_REF_CREATE_SHIFT = "createShift" ;
 
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     public static final String SESSION_FIELD_START_TIME = "startTime";
@@ -38,4 +40,7 @@ public class Constants {
     public static final String HTTP_CALLABLE_REF_LOGIN_ADMIN = "loginAdmin";
     public static final String ROLE_ADMIN = "admin";
     public static final String ROLE_USER = "user";
+    public static final int MORNING_SHIFT = 0;
+    public static final int LATE_SHIFT = 1;
+    public static final int NIGHT_SHIFT = 2;
 }

@@ -65,6 +65,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/TextAppearance.Material3.BodyMedium"
+            android:id="@+id/weekDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/spacer"
