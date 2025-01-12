@@ -5,7 +5,10 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ShiftModel implements Serializable {
     private String id;
@@ -25,8 +28,13 @@ public class ShiftModel implements Serializable {
     public ShiftModel(String shiftType, DocumentSnapshot document) {
         this.id = document.getId();
         this.shiftType = shiftType;
-        this.startDate = document.getString("startDate");
-        this.endDate = document.getString("endDate");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.getDefault());
+        Date start = document.getTimestamp("startDate").toDate();
+        Date end = document.getTimestamp("endDate").toDate();
+
+        this.startDate = "Shiftplan gültig ab: "+dateFormat.format(start).toString();
+        this.endDate = "Shiftplan endet um: "+dateFormat.format(end).toString();
     }
 
     public String getId() {

@@ -1,5 +1,6 @@
 package com.albsig.stundenmanager.ui.shifts;
 
+import static androidx.lifecycle.LiveDataKt.observe;
 import static com.albsig.stundenmanager.R.*;
 
 import android.annotation.SuppressLint;
@@ -29,8 +30,10 @@ import com.albsig.stundenmanager.domain.model.session.ShiftModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.user_overview.UserOverviewFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,11 +70,6 @@ public class ShiftFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentShiftsBinding.inflate(inflater, container, false);
 
-        /*
-        binding.recyclerShifts.setLayoutManager(new LinearLayoutManager(getContext()));
-        shiftAdapter = new ShiftAdapter(shiftList);
-        binding.recyclerShifts.setAdapter(shiftAdapter);
-         */
         shiftAdapter = new ShiftAdapter();
         binding.recyclerShifts.setAdapter(shiftAdapter);
 
@@ -100,77 +98,24 @@ public class ShiftFragment extends Fragment {
             }
 
             userModel = userModelResult.getValue();
-        });
 
-        shiftViewModel.getShifts().observe(getViewLifecycleOwner(), shiftResult -> {
-            if (!shiftResult.isSuccess()) {
-                Toast.makeText(mContext, "Shifts not found - " + shiftResult.getError(), Toast.LENGTH_SHORT).show();
-                return;
-            }
+            shiftViewModel.getShifts(userModel.getUid());
 
-            List<ShiftModel> shiftsList = shiftResult.getValue();
-            Log.d(TAG, "Found the following shifts: "+shiftsList);
-            fetchShifts(shiftsList);
+            shiftViewModel.getShifts().observe(getViewLifecycleOwner(), shiftResult -> {
+                if (!shiftResult.isSuccess()) {
+                    Toast.makeText(mContext, "Shifts not found - " + shiftResult.getError(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                List<ShiftModel> shiftsList = shiftResult.getValue();
+                Log.d(TAG, "Found the following shifts: "+shiftsList);
+                fetchShifts(shiftsList);
+            });
         });
     }
 
     private void fetchShifts(List<ShiftModel> shifts) {
-        //FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         shiftAdapter.updateData(shifts);
-
-        /*
-        db.collection("shifts").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    // Extract shift fields
-                    List<DocumentReference> morningShift = (List<DocumentReference>) document.get("morningShift");
-                    List<DocumentReference> lateShift = (List<DocumentReference>) document.get("lateShift");
-                    List<DocumentReference> nightShift = (List<DocumentReference>) document.get("nightShift");
-
-                    Timestamp startDate = document.getTimestamp("startDate");
-                    Timestamp endDate = document.getTimestamp("endDate");
-
-                    // Check if the user is in morning shifts
-                    if (morningShift != null && isUserInShift(morningShift, userUid)) {
-                        shiftList.add(new Shift(
-                                document.getId(),
-                                "Morning",
-                                startDate.toDate().toString(),
-                                endDate.toDate().toString()
-                        ));
-                    }
-
-                    // Check if the user is in late shifts
-                    if (lateShift != null && isUserInShift(lateShift, userUid)) {
-                        shiftList.add(new Shift(
-                                document.getId(),
-                                "Late",
-                                startDate.toDate().toString(),
-                                endDate.toDate().toString()
-                        ));
-                    }
-
-                    // Check if the user is in night shifts
-                    if (nightShift != null && isUserInShift(nightShift, userUid)) {
-                        shiftList.add(new Shift(
-                                document.getId(),
-                                "Night",
-                                startDate.toDate().toString(),
-                                endDate.toDate().toString()
-                        ));
-                    }
-                }
-
-                // Notify the adapter of data changes
-                shiftAdapter.notifyDataSetChanged();
-
-                Log.d(TAG, ""+shiftAdapter.getItemCount());
-            } else {
-                Log.d(TAG, "Couldn't fetch shifts");
-            }
-        });
-         */
     }
 
     private void signOut() {
