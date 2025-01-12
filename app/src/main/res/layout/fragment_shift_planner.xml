@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:id="@+id/tvHello"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/shiftPlaner"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLeft"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:icon="@drawable/round_arrow_left_24"
+        app:iconSize="24dp"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintTop_toBottomOf="@id/tvHello"
+        android:layout_marginTop="32dp"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRight"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:icon="@drawable/round_arrow_right_24"
+        app:iconSize="24dp"
+        app:layout_constraintTop_toTopOf="@id/btnLeft"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/llWeekPicker"
+        app:layout_constraintStart_toEndOf="@id/btnLeft"
+        app:layout_constraintEnd_toStartOf="@id/btnRight"
+        app:layout_constraintTop_toTopOf="@id/btnLeft"
+        app:layout_constraintBottom_toBottomOf="@id/btnLeft"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvShowWeek"
+            android:text="@string/week"
+            android:textAlignment="center"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:id="@+id/weekDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/spacer"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"/>
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvTitleMorningShift"
+        android:text="@string/morningShift"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/llWeekPicker"
+        android:layout_marginTop="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvBtnPickMorningShift"
+        android:text="@string/pick"
+        android:textColor="@color/common_google_signin_btn_text_light_default"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvTitleMorningShift"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvTitleLateShift"
+        android:text="@string/lateShift"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvBtnPickMorningShift"
+        android:layout_marginTop="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvBtnPickLateShift"
+        android:text="@string/pick"
+        android:textColor="@color/common_google_signin_btn_text_light_default"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvTitleLateShift"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvTitleNightShift"
+        android:text="@string/nightShift"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvBtnPickLateShift"
+        android:layout_marginTop="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvBtnPickNightShift"
+        android:text="@string/pick"
+        android:textColor="@color/common_google_signin_btn_text_light_default"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvTitleNightShift"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:id="@+id/btnSignOut"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        app:icon="@drawable/ic_ai"
+        app:iconTint="@color/common_google_signin_btn_text_light_default"
+        app:iconSize="24dp"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnCreate"
+        android:text="@string/create"
+        android:textAllCaps="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/tvBtnPickNightShift"
+        android:layout_marginHorizontal="32dp"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_start"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_end"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
