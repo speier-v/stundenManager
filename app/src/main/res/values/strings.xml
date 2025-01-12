@@ -46,4 +46,7 @@
     <string name="pick_worker">Auswählen der Mitarbeiter</string>
     <string name="picked">Ausgewählt</string>
     <string name="placeholder">...</string>
+    <string name="workingTimes">Zeiteintragung</string>
+    <string name="ownShifts">Zugeteilte Schichten</string>
+    <string name="vacationOrIllness">Urlaub/Krankheit</string>
 </resources>
