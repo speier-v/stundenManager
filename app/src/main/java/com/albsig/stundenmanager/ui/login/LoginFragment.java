@@ -23,6 +23,7 @@ import com.albsig.stundenmanager.ui.adminlogin.AdminLoginFragment;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.databinding.FragmentLoginBinding;
 import com.albsig.stundenmanager.ui.registration.RegistrationFragment;
+import com.albsig.stundenmanager.ui.user_overview.UserOverviewFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,8 +92,8 @@ public class LoginFragment extends Fragment {
     }
 
     private void goToDashboard() {
-        DashboardFragment dashboardFragment = new DashboardFragment();
-        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, dashboardFragment, Constants.TAG_DASHBOARD);
+        UserOverviewFragment userOverviewFragment = new UserOverviewFragment();
+        fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, userOverviewFragment, Constants.TAG_DASHBOARD);
 
         fragmentTransaction.commit();
     }

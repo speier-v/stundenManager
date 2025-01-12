@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    //id("com.android.application") version "8.7.0" apply false
+    //id("com.android.library") version "8.7.0" apply false
+    //id("org.jetbrains.kotlin.android") version "2.0.20" apply false
     id("com.google.gms.google-services")
 }
 
@@ -46,7 +49,12 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.support.annotations)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(platform(libs.firebase.bom))

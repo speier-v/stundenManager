@@ -23,6 +23,7 @@ public class Constants {
     public static final String USERS_COLLECTION = "users";
     public static final String SESSIONS_COLLECTION = "sessions";
     public static final String SHIFTS_COLLECTION = "shifts";
+    public static final String ASSIGNED_SESSIONS_COLLECTION = "shifts";
 
     public static final String HTTP_CALLABLE_REF_CREATE_USER = "createUser";
     public static final String HTTP_CALLABLE_REF_CREATE_SHIFT = "createShift" ;

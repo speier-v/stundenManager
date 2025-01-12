@@ -28,6 +28,7 @@ import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.time.DetailTimeFragment;
+import com.albsig.stundenmanager.ui.user_overview.UserOverviewFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -94,6 +95,7 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         initObserver();
         signOut();
         setAddSessionButton();
+        navigateBack();
     }
 
     private void setAddSessionButton() {
@@ -207,5 +209,14 @@ public class DashboardFragment extends Fragment implements SessionsAdapter.OnSes
         DetailTimeFragment newDetailTimeFragment = new DetailTimeFragment();
         FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, newDetailTimeFragment, Constants.TAG_DETAIL_TIME).addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    private void navigateBack() {
+        FloatingActionButton fabNavBack = binding.fabBack;
+
+        fabNavBack.setOnClickListener(view -> {
+            FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, UserOverviewFragment.class, null, Constants.TAG_DASHBOARD).setReorderingAllowed(true);
+            fragmentTransaction.commit();
+        });
     }
 }

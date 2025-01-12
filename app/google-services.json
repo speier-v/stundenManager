@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "137689182093",
+    "project_id": "stundenmanager-ffbb7",
+    "storage_bucket": "stundenmanager-ffbb7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137689182093:android:3387df57790fb48d8757c4",
+        "android_client_info": {
+          "package_name": "com.albsig.stundenmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDHWAT2uwQfl7gXlr8goQ98lz50KKnaXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
