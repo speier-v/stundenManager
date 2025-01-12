@@ -14,6 +14,8 @@ import com.google.firebase.Timestamp;
 
 import org.json.JSONObject;
 
+import java.util.Map;
+
 public class UserViewModel extends ViewModel {
 
     private static final String TAG = "UserViewModel";
@@ -78,9 +80,56 @@ public class UserViewModel extends ViewModel {
     }
 
     public void createIllness(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
+        if( userModelResult.getValue() == null) {
+            callback.onError(Result.error(new Exception("User not logged in")));
+            return;
+        }
+        String uid = userModelResult.getValue().getValue().getUid();
+        JSONObject illnessData = new JSONObject(
+                Map.of(
+                        "startDate", startTimestamp.toDate().getTime(),
+                        "endDate", endTimestamp.toDate().getTime(),
+                        "uid", uid
+                )
+        );
 
+        userRepository.createIllness(illnessData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                callback.onError(error);
+            }
+        });
     }
 
     public void createVacation(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
+        if( userModelResult.getValue() == null) {
+            callback.onError(Result.error(new Exception("User not logged in")));
+            return;
+        }
+        String uid = userModelResult.getValue().getValue().getUid();
+        JSONObject vacationData = new JSONObject(
+                Map.of(
+                        "startDate", startTimestamp.toDate().getTime(),
+                        "endDate", endTimestamp.toDate().getTime(),
+                        "uid", uid
+                )
+        );
+
+        userRepository.createVacation(vacationData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                callback.onError(error);
+            }
+        });
     }
 }

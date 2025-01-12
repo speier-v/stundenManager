@@ -134,6 +134,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void createVacation(JSONObject vacationData, ResultCallback<Boolean> resultCallback) {
+        Log.d(TAG, "createVacation: " + vacationData);
         firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_VACATION).call(vacationData).addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.d(TAG, "Create vacation failed " + task.getException());

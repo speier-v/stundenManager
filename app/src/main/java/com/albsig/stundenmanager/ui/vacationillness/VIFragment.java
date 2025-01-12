@@ -87,6 +87,12 @@ public class VIFragment extends Fragment {
                     @Override
                     public void onSuccess(Result<Boolean> response) {
                         Toast.makeText(mContext, "Illness created successfully", Toast.LENGTH_SHORT).show();
+                        startTimestamp = null;
+                        endTimestamp = null;
+                        binding.checkIllness.setChecked(false);
+                        binding.checkVacation.setChecked(false);
+                        binding.valueStartTime.setText("");
+                        binding.valueEndTime.setText("");
                     }
 
                     @Override
@@ -101,6 +107,12 @@ public class VIFragment extends Fragment {
                     @Override
                     public void onSuccess(Result<Boolean> response) {
                         Toast.makeText(mContext, "Vacation created successfully", Toast.LENGTH_SHORT).show();
+                        startTimestamp = null;
+                        endTimestamp = null;
+                        binding.checkIllness.setChecked(false);
+                        binding.checkVacation.setChecked(false);
+                        binding.valueStartTime.setText("");
+                        binding.valueEndTime.setText("");
                     }
 
                     @Override
