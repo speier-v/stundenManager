@@ -11,9 +11,11 @@ import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +25,8 @@ import com.google.firebase.functions.FirebaseFunctions;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class UserRepositoryImpl implements UserRepository {
@@ -146,4 +150,44 @@ public class UserRepositoryImpl implements UserRepository {
             resultCallback.onSuccess(Result.success(true));
         });
     }
+
+    @Override
+    public void getVIList(String uid, ResultCallback<List<VIModel>> resultCallback) {
+        List<VIModel> viList = new ArrayList<>();
+        firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.VACATION_COLLECTION).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                Log.d(TAG, document.getId() + " => " + document.getData());
+                String docId = document.getId();
+                Timestamp startDate = document.getTimestamp("startDate");
+                Timestamp endDate = document.getTimestamp("endDate");
+                String approval = (String) document.get("approval");
+                VIModel viModel = new VIModel(uid, docId, Constants.VACATION_COLLECTION, startDate, endDate, approval);
+                viList.add(viModel);
+            }
+
+            firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.ILLNESS_COLLECTION).get().addOnCompleteListener(task2 -> {
+                if (!task2.isSuccessful()) {
+                    resultCallback.onError(Result.error(task2.getException()));
+                    return;
+                }
+
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    String docId = document.getId();
+                    Timestamp startDate = (Timestamp) document.get("startDate");
+                    Timestamp endDate = (Timestamp) document.get("endDate");
+                    String approval = (String) document.get("approval");
+                    VIModel viModel = new VIModel(uid, docId, Constants.ILLNESS_COLLECTION, startDate, endDate, approval);
+                    viList.add(viModel);
+                }
+                resultCallback.onSuccess(Result.success(viList));
+            });
+        });
+    }
+
+
 }

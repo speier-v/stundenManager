@@ -1,7 +1,6 @@
 package com.albsig.stundenmanager.ui.vacationillness;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
@@ -22,11 +22,13 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentVacactionIllnessBinding;
+import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.ui.user_overview.UserOverviewFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class VIFragment extends Fragment {
 
@@ -35,6 +37,9 @@ public class VIFragment extends Fragment {
     Timestamp startTimestamp;
     Timestamp endTimestamp;
     UserViewModel userViewModel;
+    RecyclerView rvList;
+    VIAdapter viAdapter;
+    String uid;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -65,9 +70,15 @@ public class VIFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initCheckboxes();
         navigateBack();
+        initButtonsDate();
+        initCreateBtn();
+        initList();
+        setVIList();
+    }
+
+    private void initButtonsDate() {
         binding.btnStartTime.setOnClickListener(v -> startProcessStartDate());
         binding.btnEndTime.setOnClickListener(v -> startProcessEndDate());
-        initCreateBtn();
     }
 
     private void initCreateBtn() {
@@ -93,6 +104,7 @@ public class VIFragment extends Fragment {
                         binding.checkVacation.setChecked(false);
                         binding.valueStartTime.setText("");
                         binding.valueEndTime.setText("");
+                        getVIList();
                     }
 
                     @Override
@@ -180,6 +192,43 @@ public class VIFragment extends Fragment {
         fabNavBack.setOnClickListener(view -> {
             FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, UserOverviewFragment.class, null, Constants.TAG_DASHBOARD).setReorderingAllowed(true);
             fragmentTransaction.commit();
+        });
+    }
+
+    private void initList() {
+        rvList = binding.rvVI;
+        viAdapter = new VIAdapter();
+        rvList.setAdapter(viAdapter);
+    }
+
+    private void setVIList() {
+        userViewModel.getUserModel().observe(getViewLifecycleOwner(), userModelResult -> {
+            if (userModelResult.getValue() == null) {
+                Toast.makeText(mContext, "User not logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            uid = userModelResult.getValue().getUid();
+
+            getVIList();
+        });
+    }
+
+    private void getVIList() {
+        userViewModel.getVIList(uid, new ResultCallback<List<VIModel>>() {
+            @Override
+            public void onSuccess(Result<List<VIModel>> response) {
+                if (response.getValue().isEmpty()) {
+                    return;
+                }
+
+                List<VIModel> resList = response.getValue();
+                viAdapter.updateData(resList);
+            }
+
+            @Override
+            public void onError(Result<List<VIModel>> error) {
+                Toast.makeText(mContext, "Error getting VI list", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

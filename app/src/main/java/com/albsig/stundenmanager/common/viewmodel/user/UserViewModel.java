@@ -9,11 +9,13 @@ import androidx.lifecycle.ViewModel;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.firebase.Timestamp;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 public class UserViewModel extends ViewModel {
@@ -129,6 +131,21 @@ public class UserViewModel extends ViewModel {
             @Override
             public void onError(Result<Boolean> error) {
                 callback.onError(error);
+            }
+        });
+    }
+
+    public void getVIList(String uid, ResultCallback<List<VIModel>> resultCallback) {
+        userRepository.getVIList(uid, new ResultCallback<List<VIModel>>() {
+
+            @Override
+            public void onSuccess(Result<List<VIModel>> response) {
+                resultCallback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<List<VIModel>> error) {
+                resultCallback.onError(error);
             }
         });
     }

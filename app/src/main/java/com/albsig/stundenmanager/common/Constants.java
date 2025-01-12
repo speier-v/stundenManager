@@ -50,4 +50,9 @@ public class Constants {
     public static final int LATE_SHIFT = 1;
     public static final int NIGHT_SHIFT = 2;
     public static final int NO_SHIFT_SELECTED = -1;
+
+    public static final String APPROVAL_TYPE = "Vacation";
+    public static final String APPROVAL_TYPE_ILLNESS = "Illness";
+    public static final String APPROVAL_STATUS_CHECK = "check";
+    public static final String APPROVAL_STATUS_ACCEPTED = "accepted";
 }

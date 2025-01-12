@@ -5,29 +5,30 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/text_shift_type"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/type"
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/text_start_date"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viStartDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/startDate"
         android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/text_end_date"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viEndDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/endDate"
         android:textSize="14sp" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvApproval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/status"/>
