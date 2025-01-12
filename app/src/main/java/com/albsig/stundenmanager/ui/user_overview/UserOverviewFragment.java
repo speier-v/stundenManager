@@ -1,7 +1,5 @@
 package com.albsig.stundenmanager.ui.user_overview;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,29 +16,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
-import com.albsig.stundenmanager.common.Helpers;
-import com.albsig.stundenmanager.common.callbacks.Result;
-import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.session.SessionViewModel;
 import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
-import com.albsig.stundenmanager.databinding.FragmentDashboardBinding;
 import com.albsig.stundenmanager.databinding.FragmentUserOverviewBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
-import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
-import com.albsig.stundenmanager.ui.dashboard.SessionsAdapter;
 import com.albsig.stundenmanager.ui.login.LoginFragment;
 import com.albsig.stundenmanager.ui.shifts.ShiftFragment;
-import com.albsig.stundenmanager.ui.time.DetailTimeFragment;
+import com.albsig.stundenmanager.ui.vacationillness.VIFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.Timestamp;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
 
 public class UserOverviewFragment extends Fragment {
 
@@ -68,14 +52,12 @@ public class UserOverviewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentUserOverviewBinding.inflate(inflater, container, false);
-        //setupRecyclerView();
         return binding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //sessionsAdapter.clearListener();
         binding = null;
     }
 
@@ -84,8 +66,9 @@ public class UserOverviewFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initObserver();
         signOut();
-        assignedSessions();
-        sessionDashboard();
+        goToShifts();
+        goToWorkingTimes();
+        goToVacationOrIllness();
     }
 
     private void initObserver() {
@@ -97,21 +80,7 @@ public class UserOverviewFragment extends Fragment {
 
             userModel = userModelResult.getValue();
             binding.titleUserNameDash.setText(userModel.getSurname());
-            //sessionsAdapter.setUid(userModel.getUid());
-            //sessionViewModel.addSessionsSnapshot(userModel.getUid());
         });
-
-        /*
-        sessionViewModel.getSessions().observe(getViewLifecycleOwner(), sessionsResult -> {
-            if (!sessionsResult.isSuccess()) {
-                Toast.makeText(mContext, "Session not found - " + sessionsResult.getError(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            List<SessionModel> sessionList = sessionsResult.getValue();
-            //loadSessionDates(sessionList);
-        });
-         */
     }
 
     private void signOut() {
@@ -130,8 +99,17 @@ public class UserOverviewFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    private void assignedSessions() {
-        Button btnAssignedSessions = binding.zuSchichten;
+    private void goToVacationOrIllness() {
+        Button btnVI = binding.btnVacationIllness;
+
+        btnVI.setOnClickListener(view -> {
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, VIFragment.class, null, Constants.TAG_VACATION_ILLNESS).setReorderingAllowed(true);
+            fragmentTransaction.commit();
+        });
+    }
+
+    private void goToShifts() {
+        Button btnAssignedSessions = binding.btnToShifts;
 
         btnAssignedSessions.setOnClickListener(view -> {
             FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, ShiftFragment.class, null, Constants.TAG_LOGIN).setReorderingAllowed(true);
@@ -139,8 +117,8 @@ public class UserOverviewFragment extends Fragment {
         });
     }
 
-    private void sessionDashboard() {
-        Button btnAssignedSessions = binding.zeiteintragung;
+    private void goToWorkingTimes() {
+        Button btnAssignedSessions = binding.btnToWorkingTimes;
 
         btnAssignedSessions.setOnClickListener(view -> {
             FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, DashboardFragment.class, null, Constants.TAG_DASHBOARD).setReorderingAllowed(true);

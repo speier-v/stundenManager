@@ -5,27 +5,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Button
-        android:id="@+id/zuSchichten"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:text="Zugeteilte Schichten"
-        app:layout_constraintBottom_toTopOf="@+id/zeiteintragung"
-        app:layout_constraintEnd_toStartOf="@+id/gl_end"
-        app:layout_constraintStart_toEndOf="@+id/gl_start"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/zeiteintragung"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:text="Zeiteintragung"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/gl_end"
-        app:layout_constraintStart_toEndOf="@+id/gl_start"
-        app:layout_constraintTop_toBottomOf="@+id/zuSchichten"
-        />
-
     <com.google.android.material.textview.MaterialTextView
         style="@style/TextAppearance.AppCompat.Display2"
         android:id="@+id/tvHelloDash"
@@ -46,6 +25,38 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="4dp"
         android:text="@string/name"
+        />
+
+    <Button
+        android:id="@+id/btnToShifts"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:text="@string/ownShifts"
+        app:layout_constraintTop_toBottomOf="@id/tvHelloDash"
+        app:layout_constraintBottom_toTopOf="@id/btnVacationIllness"
+        app:layout_constraintEnd_toStartOf="@+id/gl_end"
+        app:layout_constraintStart_toEndOf="@+id/gl_start" />
+
+    <Button
+        android:id="@+id/btnVacationIllness"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:text="@string/vacationOrIllness"
+        app:layout_constraintEnd_toStartOf="@+id/gl_end"
+        app:layout_constraintStart_toEndOf="@+id/gl_start"
+        app:layout_constraintTop_toBottomOf="@+id/btnToShifts"
+        app:layout_constraintBottom_toTopOf="@id/btnToWorkingTimes"
+        />
+
+    <Button
+        android:id="@+id/btnToWorkingTimes"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:text="@string/workingTimes"
+        app:layout_constraintEnd_toStartOf="@+id/gl_end"
+        app:layout_constraintStart_toEndOf="@+id/gl_start"
+        app:layout_constraintTop_toBottomOf="@+id/btnVacationIllness"
+        app:layout_constraintBottom_toTopOf="@id/fabSignOut"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -9,9 +9,14 @@ import androidx.lifecycle.ViewModel;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
+import com.google.firebase.Timestamp;
 
 import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Map;
 
 public class UserViewModel extends ViewModel {
 
@@ -73,6 +78,75 @@ public class UserViewModel extends ViewModel {
                 Log.d(TAG, "Registration failed ");
             }
 
+        });
+    }
+
+    public void createIllness(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
+        if( userModelResult.getValue() == null) {
+            callback.onError(Result.error(new Exception("User not logged in")));
+            return;
+        }
+        String uid = userModelResult.getValue().getValue().getUid();
+        JSONObject illnessData = new JSONObject(
+                Map.of(
+                        "startDate", startTimestamp.toDate().getTime(),
+                        "endDate", endTimestamp.toDate().getTime(),
+                        "uid", uid
+                )
+        );
+
+        userRepository.createIllness(illnessData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void createVacation(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
+        if( userModelResult.getValue() == null) {
+            callback.onError(Result.error(new Exception("User not logged in")));
+            return;
+        }
+        String uid = userModelResult.getValue().getValue().getUid();
+        JSONObject vacationData = new JSONObject(
+                Map.of(
+                        "startDate", startTimestamp.toDate().getTime(),
+                        "endDate", endTimestamp.toDate().getTime(),
+                        "uid", uid
+                )
+        );
+
+        userRepository.createVacation(vacationData, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getVIList(String uid, ResultCallback<List<VIModel>> resultCallback) {
+        userRepository.getVIList(uid, new ResultCallback<List<VIModel>>() {
+
+            @Override
+            public void onSuccess(Result<List<VIModel>> response) {
+                resultCallback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<List<VIModel>> error) {
+                resultCallback.onError(error);
+            }
         });
     }
 }

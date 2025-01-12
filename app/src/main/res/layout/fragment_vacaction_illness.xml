@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/titleUserNameDash"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:layout_marginTop="8dp"
+        android:text="@string/vacationIllnessTitle"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clIsVacation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/titleUserNameDash"
+        >
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/titleVacation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/checkVacation"
+            android:text="@string/vacation"
+            />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkVacation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/titleVacation"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clIsIllness"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toBottomOf="@id/clIsVacation"
+        >
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/titleIllness"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/checkIllness"
+            android:text="@string/illness"
+            />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkIllness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/titleIllness"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:id="@+id/titleStartTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_time"
+        app:layout_constraintTop_toBottomOf="@id/clIsIllness"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        android:layout_marginTop="24dp"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:id="@+id/valueStartTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/minus"
+        app:layout_constraintStart_toEndOf="@id/titleStartTime"
+        app:layout_constraintTop_toTopOf="@id/titleStartTime"
+        app:layout_constraintBottom_toBottomOf="@id/titleStartTime"
+        app:layout_constraintEnd_toStartOf="@id/btnStartTime"
+        android:layout_marginHorizontal="12dp"
+        android:textAlignment="center"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:id="@+id/btnStartTime"
+        android:layout_width="0dp"
+        app:icon="@drawable/ic_plus"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="@id/titleStartTime"
+        app:layout_constraintBottom_toBottomOf="@id/titleStartTime"
+        />
+
+
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:id="@+id/titleEndTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/end_time"
+        app:layout_constraintTop_toBottomOf="@id/titleStartTime"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        android:layout_marginTop="32dp"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:id="@+id/valueEndTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/minus"
+        app:layout_constraintStart_toEndOf="@id/titleEndTime"
+        app:layout_constraintTop_toTopOf="@id/titleEndTime"
+        app:layout_constraintBottom_toBottomOf="@id/titleEndTime"
+        app:layout_constraintEnd_toStartOf="@id/btnEndTime"
+        android:layout_marginHorizontal="12dp"
+        android:textAlignment="center"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:id="@+id/btnEndTime"
+        android:layout_width="0dp"
+        app:icon="@drawable/ic_plus"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        app:layout_constraintTop_toTopOf="@id/titleEndTime"
+        app:layout_constraintBottom_toBottomOf="@id/titleEndTime"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ShapeAppearanceOverlay.Material3.Button"
+        android:id="@+id/btnCreate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/titleEndTime"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:text="@string/create"
+        />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/div1"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toBottomOf="@id/btnCreate"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        app:layout_constraintEnd_toEndOf="@id/gl_end"
+        android:layout_marginTop="12dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvVI"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/div1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_vacation_illness"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_start"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_end"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/gl_start"
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="@color/cardview_light_background"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
