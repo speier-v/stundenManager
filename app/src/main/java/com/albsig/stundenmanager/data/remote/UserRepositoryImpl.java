@@ -117,4 +117,32 @@ public class UserRepositoryImpl implements UserRepository {
         firebaseAuth.signOut();
         resultCallback.onSuccess(Result.success(true));
     }
+
+    @Override
+    public void createIllness(JSONObject illnessData, ResultCallback<Boolean> resultCallback) {
+        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_ILLNESS).call(illnessData).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.d(TAG, "Create illness failed " + task.getException());
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            Log.d(TAG, "Create illness successful");
+            resultCallback.onSuccess(Result.success(true));
+        });
+    }
+
+    @Override
+    public void createVacation(JSONObject vacationData, ResultCallback<Boolean> resultCallback) {
+        firebaseFunctions.getHttpsCallable(Constants.HTTP_CALLABLE_REF_CREATE_VACATION).call(vacationData).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.d(TAG, "Create vacation failed " + task.getException());
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            Log.d(TAG, "Create vacation successful");
+            resultCallback.onSuccess(Result.success(true));
+        });
+    }
 }

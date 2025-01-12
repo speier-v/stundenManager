@@ -13,4 +13,8 @@ public interface UserRepository {
     void loginUser(JSONObject userData, ResultCallback<UserModel> resultCallback);
 
     void signOutUser(ResultCallback<Boolean> resultCallback);
+
+    void createIllness(JSONObject illnessData, ResultCallback<Boolean> resultCallback);
+
+    void createVacation(JSONObject vacationData, ResultCallback<Boolean> resultCallback);
 }

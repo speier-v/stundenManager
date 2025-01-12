@@ -8,6 +8,9 @@ public class Constants {
     public static final String TAG_REGISTRATION = "Registration";
     public static final String TAG_ADMIN_LOGIN = "AdminLogin";
     public static final String TAG_SHIFT_PLANNER = "ShiftPlanner";
+    public static final String TAG_VACATION_ILLNESS = "VacationIllness";
+    public static final String HTTP_CALLABLE_REF_CREATE_VACATION = "createVacation";
+    public static final String HTTP_CALLABLE_REF_CREATE_ILLNESS = "createIllness";
     public static String TAG_ADMIN_DASHBOARD = "AdminDashboard";
 
     public static final String USER_MODEL_ID = "uid";
@@ -22,6 +25,8 @@ public class Constants {
     public static final String USER_MODEL_ROLE = "role";
     public static final String USERS_COLLECTION = "users";
     public static final String SESSIONS_COLLECTION = "sessions";
+    public static final String VACATION_COLLECTION = "vacation";
+    public static final String ILLNESS_COLLECTION = "illness";
     public static final String SHIFTS_COLLECTION = "shifts";
     public static final String ASSIGNED_SESSIONS_COLLECTION = "shifts";
 

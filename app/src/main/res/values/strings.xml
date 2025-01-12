@@ -49,4 +49,12 @@
     <string name="workingTimes">Zeiteintragung</string>
     <string name="ownShifts">Zugeteilte Schichten</string>
     <string name="vacationOrIllness">Urlaub/Krankheit</string>
+    <string name="vacationIllnessTitle">Krankheit / Urlaub</string>
+    <string name="vacation">Urlaub</string>
+    <string name="illness">Krankheit</string>
+    <string name="minus">-</string>
+    <string name="type">type</string>
+    <string name="startDate">Start date</string>
+    <string name="endDate">End date</string>
+    <string name="status">Status</string>
 </resources>

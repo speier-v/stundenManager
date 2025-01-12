@@ -10,6 +10,7 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
+import com.google.firebase.Timestamp;
 
 import org.json.JSONObject;
 
@@ -74,5 +75,12 @@ public class UserViewModel extends ViewModel {
             }
 
         });
+    }
+
+    public void createIllness(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
+
+    }
+
+    public void createVacation(Timestamp startTimestamp, Timestamp endTimestamp, ResultCallback<Boolean> callback) {
     }
 }
