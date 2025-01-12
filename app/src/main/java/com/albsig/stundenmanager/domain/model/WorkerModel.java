@@ -7,12 +7,13 @@ public class WorkerModel {
     private final String name;
     private final String surname;
     private int shift;
+    private boolean isSelected;
 
-    public WorkerModel(String docId, String name, String surname, int shift) {
+    public WorkerModel(String docId, String name, String surname) {
         this.userReference = "/" + Constants.USERS_COLLECTION + "/" + docId;
         this.name = name;
         this.surname = surname;
-        this.shift = shift;
+        this.shift = Constants.NO_SHIFT_SELECTED;
     }
 
     public String getUserReference() {

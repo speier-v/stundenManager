@@ -11,6 +11,7 @@ import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.WorkerModel;
 import com.albsig.stundenmanager.domain.repository.ShiftPlannerRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,7 +46,7 @@ public class ShiftPlannerRepositoryImpl implements ShiftPlannerRepository {
 
 
     @Override
-    public void getWorkers(ResultCallback<List<UserModel>> resultCallback) {
+    public void getWorkers(ResultCallback<List<WorkerModel>> resultCallback) {
         firebaseFirestore.collection(Constants.USERS_COLLECTION)
                 .whereEqualTo(Constants.USER_MODEL_ROLE, Constants.ROLE_USER)
                 .get()
@@ -61,7 +62,7 @@ public class ShiftPlannerRepositoryImpl implements ShiftPlannerRepository {
                         return;
                     }
 
-                    List<UserModel>  workers = new ArrayList<>();
+                    List<WorkerModel>  workers = new ArrayList<>();
                     for (DocumentSnapshot doc: documents) {
                         Map<String, Object> userMap = doc.getData();
                         if (userMap == null) {
@@ -69,7 +70,8 @@ public class ShiftPlannerRepositoryImpl implements ShiftPlannerRepository {
                             return;
                         }
 
-                        UserModel workerModel = new UserModel(doc.getId(), "", doc);
+                        UserModel userModel = new UserModel(doc.getId(), "", doc);
+                        WorkerModel workerModel = new WorkerModel(userModel.getUid(), userModel.getName(), userModel.getSurname());
                         workers.add(workerModel);
                     }
 

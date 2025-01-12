@@ -45,4 +45,5 @@
     <string name="create">Erstellen</string>
     <string name="pick_worker">Auswählen der Mitarbeiter</string>
     <string name="picked">Ausgewählt</string>
+    <string name="placeholder">...</string>
 </resources>

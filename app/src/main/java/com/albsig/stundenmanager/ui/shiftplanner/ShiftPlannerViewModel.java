@@ -11,6 +11,7 @@ import com.albsig.stundenmanager.common.Helpers;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.WorkerModel;
 import com.albsig.stundenmanager.domain.repository.ShiftPlannerRepository;
 import com.google.firebase.Timestamp;
 
@@ -20,7 +21,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +28,10 @@ public class ShiftPlannerViewModel extends ViewModel {
 
     private static final String TAG = "ShiftPlannerViewModel";
     private final ShiftPlannerRepository shiftPlannerRepository;
-    private final MutableLiveData<Result<List<UserModel>>> resultLiveData = new MutableLiveData<>();
-    private final MutableLiveData<List<UserModel>> workersMorning = new MutableLiveData<>();
-    private final MutableLiveData<List<UserModel>> workersLate = new MutableLiveData<>();
-    private final MutableLiveData<List<UserModel>> workersNight = new MutableLiveData<>();
+    private final MutableLiveData<Result<List<WorkerModel>>> resultLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<WorkerModel>> workersMorning = new MutableLiveData<>();
+    private final MutableLiveData<List<WorkerModel>> workersLate = new MutableLiveData<>();
+    private final MutableLiveData<List<WorkerModel>> workersNight = new MutableLiveData<>();
     private LocalDate relativeDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -67,54 +67,54 @@ public class ShiftPlannerViewModel extends ViewModel {
         endDate = tmpDateEnd.atTime(6,0,0,0);
     }
 
-    public LiveData<Result<List<UserModel>>> getResultLiveData() {
+    public LiveData<Result<List<WorkerModel>>> getResultLiveData() {
         return resultLiveData;
     }
 
-    public LiveData<List<UserModel>> getWorkersMorning() {
+    public LiveData<List<WorkerModel>> getWorkersMorning() {
         return workersMorning;
     }
 
-    public LiveData<List<UserModel>> getWorkersLate() {
+    public LiveData<List<WorkerModel>> getWorkersLate() {
         return workersLate;
     }
 
-    public LiveData<List<UserModel>> getWorkersNight() {
+    public LiveData<List<WorkerModel>> getWorkersNight() {
         return workersNight;
     }
 
-    public void getUser() {
-        shiftPlannerRepository.getWorkers(new ResultCallback<List<UserModel>>() {
+    public void getWorker() {
+        shiftPlannerRepository.getWorkers(new ResultCallback<List<WorkerModel>>() {
             @Override
-            public void onSuccess(Result<List<UserModel>> response) {
+            public void onSuccess(Result<List<WorkerModel>> response) {
                 resultLiveData.setValue(response);
             }
 
             @Override
-            public void onError(Result<List<UserModel>> error) {
+            public void onError(Result<List<WorkerModel>> error) {
                 resultLiveData.setValue(error);
             }
         });
     }
 
-    public void addWorkerToShift(int shift, UserModel worker) {
-        List<UserModel> shiftList= new ArrayList<>();
+    public void addWorkerToShift(WorkerModel worker) {
+        List<WorkerModel> shiftList= new ArrayList<>();
 
-        if (shift == Constants.MORNING_SHIFT) {
+        if (worker.getShift() == Constants.MORNING_SHIFT) {
             if (workersMorning.getValue() != null) {
                 shiftList = workersMorning.getValue();
             }
 
             shiftList.add(worker);
             workersMorning.setValue(shiftList);
-        } else if (shift == Constants.LATE_SHIFT) {
+        } else if (worker.getShift() == Constants.LATE_SHIFT) {
             if (workersLate.getValue() != null) {
                 shiftList = workersLate.getValue();
             }
 
             shiftList.add(worker);
             workersLate.setValue(shiftList);
-        } else if (shift == Constants.NIGHT_SHIFT) {
+        } else if (worker.getShift() == Constants.NIGHT_SHIFT) {
             if (workersNight.getValue() != null) {
                 shiftList = workersNight.getValue();
             }
@@ -124,29 +124,29 @@ public class ShiftPlannerViewModel extends ViewModel {
         }
     }
 
-    public void removeWorkerFromShift(int shift, UserModel userModel) {
-        List<UserModel> shiftList= new ArrayList<>();
+    public void removeWorkerFromShift(WorkerModel worker) {
+        List<WorkerModel> shiftList= new ArrayList<>();
 
-        if (shift == Constants.MORNING_SHIFT) {
+        if (worker.getShift() == Constants.MORNING_SHIFT) {
             if (workersMorning.getValue() != null) {
                 shiftList = workersMorning.getValue();
             }
 
-            shiftList.remove(userModel);
+            shiftList.remove(worker);
             workersMorning.setValue(shiftList);
-        } else if (shift == Constants.LATE_SHIFT) {
+        } else if (worker.getShift() == Constants.LATE_SHIFT) {
             if (workersLate.getValue() != null) {
                 shiftList = workersLate.getValue();
             }
 
-            shiftList.remove(userModel);
+            shiftList.remove(worker);
             workersLate.setValue(shiftList);
-        } else if (shift == Constants.NIGHT_SHIFT) {
+        } else if (worker.getShift() == Constants.NIGHT_SHIFT) {
             if (workersNight.getValue() != null) {
                 shiftList = workersNight.getValue();
             }
 
-            shiftList.remove(userModel);
+            shiftList.remove(worker);
             workersNight.setValue(shiftList);
         }
     }
@@ -171,19 +171,16 @@ public class ShiftPlannerViewModel extends ViewModel {
         List<String> tmpWorkersLate = new ArrayList<>();
         List<String> tmpWorkersNight = new ArrayList<>();
 
-        for (UserModel worker : workersMorning.getValue()) {
-            String idReference = "/" + Constants.USERS_COLLECTION + "/"  + worker.getUid();
-            tmpWorkersMorning.add(idReference);
+        for (WorkerModel worker : workersMorning.getValue()) {
+            tmpWorkersMorning.add(worker.getUserReference());
         }
 
-        for (UserModel worker : workersLate.getValue()) {
-            String idReference = "/" + Constants.USERS_COLLECTION + "/" + worker.getUid();
-            tmpWorkersLate.add(idReference);
+        for (WorkerModel worker : workersLate.getValue()) {
+            tmpWorkersLate.add(worker.getUserReference());
         }
 
-        for (UserModel worker : workersNight.getValue()) {
-            String idReference = "/" + Constants.USERS_COLLECTION + "/" + worker.getUid();
-            tmpWorkersNight.add(idReference);
+        for (WorkerModel worker : workersNight.getValue()) {
+            tmpWorkersNight.add(worker.getUserReference());
         }
 
         Timestamp tmpStartDate = Helpers.createCustomTimestamp(startDate.getYear(), startDate.getMonth().getValue(), startDate.getDayOfMonth(), startDate.getHour(), startDate.getMinute());

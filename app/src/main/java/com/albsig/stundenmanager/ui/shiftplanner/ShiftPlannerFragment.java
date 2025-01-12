@@ -22,10 +22,10 @@ import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.data.remote.ShiftPlannerRepositoryImpl;
 import com.albsig.stundenmanager.databinding.FragmentShiftPlannerBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.WorkerModel;
 import com.albsig.stundenmanager.domain.repository.ShiftPlannerRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.Timestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +38,8 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
     private ShiftPlannerViewModel shiftPlannerViewModel;
     private BottomSheetDialog bottomSheetDialog;
     private WorkerAdapter workerAdapter;
-    private List<UserModel> workers;
+    private List<WorkerModel> workers;
+    private RecyclerView rvWorkers;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -74,7 +75,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        shiftPlannerViewModel.getUser();
+        shiftPlannerViewModel.getWorker();
         initObserver();
         initBottomSheetDialog();
         initShiftButtons();
@@ -110,7 +111,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
         }
         btnClose.setOnClickListener(view1 -> { bottomSheetDialog.dismiss(); });
 
-        RecyclerView rvWorkers = bottomSheetDialog.findViewById(R.id.rvWorkers);
+        rvWorkers = bottomSheetDialog.findViewById(R.id.rvWorkers);
         if (rvWorkers == null)  {
             return;
         }
@@ -126,10 +127,10 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
                 return;
             }
 
-            List<UserModel> resWorkers = result.getValue();
-            Toast.makeText(mContext, "Workers: " + resWorkers.size(), Toast.LENGTH_SHORT).show();
-            Log.d("ShiftPlannerFragment", "Workers: " + resWorkers);
-            workerAdapter.updateList(resWorkers);
+            workers = result.getValue();
+            Toast.makeText(mContext, "Workers: " + workers.size(), Toast.LENGTH_SHORT).show();
+            Log.d("ShiftPlannerFragment", "Workers: " + workers);
+            workerAdapter.updateList(workers);
         });
 
         shiftPlannerViewModel.getWorkersMorning().observe(getViewLifecycleOwner(), workers -> {
@@ -138,7 +139,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
                 return;
             }
 
-            String btnText = workers.size() + getString(R.string.picked);
+            String btnText = workers.size() + " " + getString(R.string.picked);
             binding.tvBtnPickMorningShift.setText(btnText);
         });
 
@@ -148,7 +149,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
                 return;
             }
 
-            String btnText = workers.size() + getString(R.string.picked);
+            String btnText = workers.size() + " " + getString(R.string.picked);
             binding.tvBtnPickLateShift.setText(btnText);
         });
 
@@ -158,7 +159,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
                 return;
             }
 
-            String btnText = workers.size() + getString(R.string.picked);
+            String btnText = workers.size() + " " + getString(R.string.picked);
             binding.tvBtnPickNightShift.setText(btnText);
         });
     }
@@ -184,8 +185,7 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
             shiftPlannerViewModel.createShift(new ResultCallback<Boolean>() {
                 @Override
                 public void onSuccess(Result<Boolean> response) {
-                    workers = new ArrayList<>();
-                    Toast.makeText(mContext, "Shift created", Toast.LENGTH_SHORT).show();
+                    onSuccessShift(response);
                 }
 
                 @Override
@@ -196,13 +196,20 @@ public class ShiftPlannerFragment extends Fragment implements WorkerAdapter.OnIt
         });
     }
 
-    @Override
-    public void onWorkerSelected(int shift, UserModel worker) {
-        shiftPlannerViewModel.addWorkerToShift(shift, worker);
+    private void onSuccessShift(Result<Boolean> response) {
+        workerAdapter = new WorkerAdapter(this);
+        rvWorkers.setAdapter(workerAdapter);
+        workerAdapter.updateList(workers);
+        Toast.makeText(mContext, "Shift created", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onWorkerDeselected(int shift, UserModel userModel) {
-        shiftPlannerViewModel.removeWorkerFromShift(shift, userModel);
+    public void onWorkerSelected(WorkerModel worker) {
+        shiftPlannerViewModel.addWorkerToShift(worker);
+    }
+
+    @Override
+    public void onWorkerDeselected(WorkerModel worker) {
+        shiftPlannerViewModel.removeWorkerFromShift(worker);
     }
 }

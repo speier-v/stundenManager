@@ -43,4 +43,5 @@ public class Constants {
     public static final int MORNING_SHIFT = 0;
     public static final int LATE_SHIFT = 1;
     public static final int NIGHT_SHIFT = 2;
+    public static final int NO_SHIFT_SELECTED = -1;
 }
