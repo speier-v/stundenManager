@@ -23,6 +23,7 @@ import com.albsig.stundenmanager.ui.adminlogin.AdminLoginFragment;
 import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
 import com.albsig.stundenmanager.ui.dashboard.SessionsAdapter;
 import com.albsig.stundenmanager.ui.shiftplanner.ShiftPlannerFragment;
+import com.albsig.stundenmanager.ui.statistic.StatisticFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 
@@ -69,6 +70,13 @@ public class AdminDashboardFragment extends Fragment {
         signOut();
 
         binding.btnShiftPlanning.setOnClickListener(v -> goToShiftPlanning());
+        binding.btnStatistics.setOnClickListener(v -> goToStatistics());
+    }
+
+    private void goToStatistics() {
+        StatisticFragment statisticFragment = new StatisticFragment();
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticFragment, Constants.TAG_ADMIN_DASHBOARD).addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void goToShiftPlanning() {

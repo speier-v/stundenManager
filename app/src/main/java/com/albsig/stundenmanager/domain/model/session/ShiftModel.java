@@ -15,6 +15,8 @@ public class ShiftModel implements Serializable {
     private String shiftType; // Morning, Late, or Night
     private String startDate;
     private String endDate;
+    private Date start;
+    private Date end;
 
     public ShiftModel() {}
 
@@ -30,11 +32,11 @@ public class ShiftModel implements Serializable {
         this.shiftType = shiftType;
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.getDefault());
-        Date start = document.getTimestamp("startDate").toDate();
-        Date end = document.getTimestamp("endDate").toDate();
+        this.start = document.getTimestamp("startDate").toDate();
+        this.end = document.getTimestamp("endDate").toDate();
 
-        this.startDate = "Shiftplan gültig ab: "+dateFormat.format(start).toString();
-        this.endDate = "Shiftplan endet um: "+dateFormat.format(end).toString();
+        this.startDate = "Shiftplan gültig ab: "+ dateFormat.format(start);
+        this.endDate = "Shiftplan endet um: "+ dateFormat.format(end);
     }
 
     public String getId() {
@@ -51,5 +53,22 @@ public class ShiftModel implements Serializable {
 
     public String getEndDate() {
         return endDate;
+    }
+
+    public int getDurationInMinutes() {
+        if (start == null || end == null) {
+            return 0;
+        }
+
+        long durationMillis = end.getTime() - start.getTime();
+        return (int) (durationMillis / (1000 * 60));
+    }
+
+    public Date getStart() {
+        return start;
+    }
+
+    public Date getEnd() {
+        return end;
     }
 }

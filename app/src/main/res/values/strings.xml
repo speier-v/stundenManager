@@ -33,7 +33,7 @@
     <string name="dashboard">Dashboard</string>
     <string name="statistics">Statistiken</string>
     <string name="home">Home</string>
-    <string name="shiftPlanning">Shichtplanung</string>
+    <string name="shiftPlanning">Schichtplanung</string>
     <string name="workerPlanning">Mitarbeiter-Verwaltung</string>
     <string name="shiftPlaner">Schichtplaner</string>
     <string name="week">Week</string>
