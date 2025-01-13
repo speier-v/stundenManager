@@ -20,6 +20,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -156,6 +157,83 @@ public class AdminRepositoryImpl implements AdminRepository {
                 }
                 resultCallback.onSuccess(Result.success(viList));
             });
+        });
+    }
+
+    @Override
+    public void getVIListToCheck(String uid, ResultCallback<List<VIModel>> resultCallback) {
+        List<VIModel> viList = new ArrayList<>();
+        firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.VACATION_COLLECTION)
+                .whereEqualTo(Constants.FIELD_APPROVAL, Constants.APPROVAL_STATUS_CHECK)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        resultCallback.onError(Result.error(task.getException()));
+                        return;
+                    }
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        String docId = document.getId();
+                        Timestamp startDate = document.getTimestamp("startDate");
+                        Timestamp endDate = document.getTimestamp("endDate");
+                        String approval = (String) document.get("approval");
+                        VIModel viModel = new VIModel(uid, docId, Constants.VACATION_COLLECTION, startDate, endDate, approval);
+                        viList.add(viModel);
+                    }
+
+                    firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                            .document(uid)
+                            .collection(Constants.ILLNESS_COLLECTION)
+                            .whereEqualTo(Constants.FIELD_APPROVAL, Constants.APPROVAL_STATUS_CHECK)
+                            .get()
+                            .addOnCompleteListener(task2 -> {
+                                if (!task2.isSuccessful()) {
+                                    resultCallback.onError(Result.error(task2.getException()));
+                                    return;
+                                }
+
+                                for (DocumentSnapshot document : task2.getResult().getDocuments()) {
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    String docId = document.getId();
+                                    Timestamp startDate = (Timestamp) document.get("startDate");
+                                    Timestamp endDate = (Timestamp) document.get("endDate");
+                                    String approval = (String) document.get("approval");
+                                    VIModel viModel = new VIModel(uid, docId, Constants.ILLNESS_COLLECTION, startDate, endDate, approval);
+                                    viList.add(viModel);
+                                }
+                                resultCallback.onSuccess(Result.success(viList));
+                            });
+                });
+    }
+
+    @Override
+    public void updateVIModel(String approvalType, String uid, String docId, ResultCallback<Boolean> resultCallback) {
+        DocumentReference docRef = firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .document(uid)
+                .collection(Constants.VACATION_COLLECTION)
+                .document(docId);
+
+        if (Constants.APPROVAL_STATUS_APPROVED.equals(approvalType)) {
+            docRef.update(Constants.FIELD_APPROVAL, Constants.APPROVAL_STATUS_APPROVED).addOnCompleteListener( task -> {
+                if (!task.isSuccessful()) {
+                    resultCallback.onError(Result.error(task.getException()));
+                    return;
+                }
+
+                resultCallback.onSuccess(Result.success(true));
+            });
+            return;
+        }
+
+        docRef.update(Constants.FIELD_APPROVAL, Constants.APPROVAL_STATUS_DENIED).addOnCompleteListener( task -> {
+            if (!task.isSuccessful()) {
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            resultCallback.onSuccess(Result.success(true));
         });
     }
 }

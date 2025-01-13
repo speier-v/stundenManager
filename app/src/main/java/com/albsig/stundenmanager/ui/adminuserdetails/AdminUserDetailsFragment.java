@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +17,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
+import com.albsig.stundenmanager.common.callbacks.Result;
+import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminUserDetailsBinding;
 import com.albsig.stundenmanager.ui.adminworkeradministration.AdminUserAdministrationFragment;
 import com.albsig.stundenmanager.ui.vacationillness.VIAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class AdminUserDetailsFragment extends Fragment {
+public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapter.OnUserApprovalClickListener {
 
     private static final String TAG = "AdminUserDetailsFragment";
     Context mContext;
@@ -31,6 +34,7 @@ public class AdminUserDetailsFragment extends Fragment {
     RecyclerView rvApproval;
     RecyclerView rvVI;
     VIAdapter viAdapter;
+    ApprovalAdapter approvalAdapter;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -58,6 +62,13 @@ public class AdminUserDetailsFragment extends Fragment {
         navigateBack();
         initObserver();
         initRecyclerVI();
+        initRecyclerApproval();
+    }
+
+    private void initRecyclerApproval() {
+        rvApproval = binding.rvApproval;
+        approvalAdapter = new ApprovalAdapter(this);
+        rvApproval.setAdapter(approvalAdapter);
     }
 
     private void initRecyclerVI() {
@@ -65,6 +76,7 @@ public class AdminUserDetailsFragment extends Fragment {
         viAdapter = new VIAdapter();
         rvVI.setAdapter(viAdapter);
     }
+
 
     private void initObserver() {
         adminViewModel.getUserDetailModel().observe( getViewLifecycleOwner(), userModel -> {
@@ -76,6 +88,7 @@ public class AdminUserDetailsFragment extends Fragment {
             binding.tvName.setText(userModel.getName());
             binding.tvSurname.setText(userModel.getSurname());
             adminViewModel.getCheckedVIList(userModel.getUid());
+            adminViewModel.getVIListToCheck(userModel.getUid());
         });
 
         adminViewModel.getCheckedVIList().observe(getViewLifecycleOwner(), result -> {
@@ -85,6 +98,14 @@ public class AdminUserDetailsFragment extends Fragment {
 
             viAdapter.updateData(result.getValue());
         });
+
+        adminViewModel.getVIListToCheck().observe(getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                return;
+            }
+
+            approvalAdapter.updateData(result.getValue());
+        });
     }
 
     private void navigateBack() {
@@ -93,6 +114,23 @@ public class AdminUserDetailsFragment extends Fragment {
         fabNavBack.setOnClickListener(view -> {
             FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, AdminUserAdministrationFragment.class, null, Constants.TAG_WORKER_ADMINISTRATION).setReorderingAllowed(true);
             fragmentTransaction.commit();
+        });
+    }
+
+    @Override
+    public void onUserApprovalUpdate(String approvalType, String uid, String docId) {
+        adminViewModel.updateVIModel(approvalType, uid, docId, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                Toast.makeText(mContext, "Successfully updated with approval type: " + approvalType, Toast.LENGTH_SHORT).show();
+                adminViewModel.getCheckedVIList(uid);
+                adminViewModel.getVIListToCheck(uid);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                Toast.makeText(mContext, "Update failed", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

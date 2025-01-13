@@ -15,4 +15,8 @@ public interface AdminRepository {
     void getUsers(ResultCallback<List<UserModel>> resultCallback);
 
     void getCheckedVIList(String uid, ResultCallback<List<VIModel>> resultCallback);
+
+    void getVIListToCheck(String uid, ResultCallback<List<VIModel>> resultCallback);
+
+    void updateVIModel(String approvalType, String uid, String docId, ResultCallback<Boolean> resultCallback);
 }

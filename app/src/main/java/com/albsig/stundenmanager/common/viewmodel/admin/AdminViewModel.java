@@ -27,6 +27,7 @@ public class AdminViewModel extends ViewModel {
 
     private MutableLiveData<UserModel> userDetailModel = new MutableLiveData<>();
     private MutableLiveData<Result<List<VIModel>>> checkedVIList = new MutableLiveData<>();
+    private MutableLiveData<Result<List<VIModel>>> viListToCheck = new MutableLiveData<>();
 
     public AdminViewModel(AdminRepository adminRepository, UserRepository userRepository) {
         this.adminRepository = adminRepository;
@@ -114,6 +115,39 @@ public class AdminViewModel extends ViewModel {
             @Override
             public void onError(Result<List<VIModel>> error) {
                 Log.d(TAG, "getCheckedVIList failed " + error.getError().toString());
+            }
+        });
+    }
+
+    public LiveData<Result<List<VIModel>>> getVIListToCheck() {
+        return viListToCheck;
+    }
+
+    public void getVIListToCheck(String uid) {
+        adminRepository.getVIListToCheck(uid, new ResultCallback<List<VIModel>>() {
+
+            @Override
+            public void onSuccess(Result<List<VIModel>> response) {
+                viListToCheck.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<List<VIModel>> error) {
+                Log.d(TAG, "getVIListToCheck failed " + error.getError().toString());
+            }
+        });
+    }
+
+    public void updateVIModel(String approvalType, String uid, String docId, ResultCallback<Boolean> callback) {
+        adminRepository.updateVIModel(approvalType, uid, docId, new ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Result<Boolean> response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(Result<Boolean> error) {
+                callback.onError(error);
             }
         });
     }

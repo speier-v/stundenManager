@@ -7,15 +7,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="8dp">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/dateTextView"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/approveButton"
-        android:padding="16dp"
-        android:textSize="16sp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/approveButton">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/startDate"
+        android:textSize="14sp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/viEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/endDate"
+        android:textSize="14sp" />
+    </LinearLayout>
+
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
