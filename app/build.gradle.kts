@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.support.annotations)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
     testImplementation(libs.junit)
     testImplementation(libs.espresso.core)
     testImplementation(libs.mockito.core)

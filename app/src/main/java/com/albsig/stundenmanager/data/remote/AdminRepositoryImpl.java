@@ -17,11 +17,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AdminRepositoryImpl implements AdminRepository {
@@ -84,5 +87,25 @@ public class AdminRepositoryImpl implements AdminRepository {
         } catch (Exception e) {
             resultCallback.onError(Result.error(e));
         }
+    }
+
+    @Override
+    public void getUsers(ResultCallback<List<UserModel>> resultCallback) {
+        firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                .whereEqualTo(Constants.USER_MODEL_ROLE, Constants.ROLE_USER)
+                .get().addOnCompleteListener(task -> {
+            List<UserModel> users = new ArrayList<>();
+            if (!task.isSuccessful()) {
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            task.getResult().forEach(documentSnapshot -> {
+                UserModel userModel = new UserModel(documentSnapshot.getId(), "", documentSnapshot);
+                users.add(userModel);
+            });
+
+            resultCallback.onSuccess(Result.success(users));
+        });
     }
 }

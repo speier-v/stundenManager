@@ -16,11 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
-import com.albsig.stundenmanager.common.viewmodel.user.UserViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminDashboardBinding;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.adminlogin.AdminLoginFragment;
-import com.albsig.stundenmanager.ui.dashboard.DashboardFragment;
+import com.albsig.stundenmanager.ui.adminworkeradministration.AdminUserAdministrationFragment;
 import com.albsig.stundenmanager.ui.dashboard.SessionsAdapter;
 import com.albsig.stundenmanager.ui.shiftplanner.ShiftPlannerFragment;
 import com.google.android.material.button.MaterialButton;
@@ -69,6 +68,7 @@ public class AdminDashboardFragment extends Fragment {
         signOut();
 
         binding.btnShiftPlanning.setOnClickListener(v -> goToShiftPlanning());
+        binding.btnWorkerPlaning.setOnClickListener(v -> goToAdminWorkerAdministrationFragment());
     }
 
     private void goToShiftPlanning() {
@@ -95,6 +95,13 @@ public class AdminDashboardFragment extends Fragment {
         AdminLoginFragment adminLoginFragment = new AdminLoginFragment();
 
         FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, adminLoginFragment, Constants.TAG_ADMIN_LOGIN);
+        fragmentTransaction.commit();
+    }
+
+    private void goToAdminWorkerAdministrationFragment() {
+        AdminUserAdministrationFragment workerAdministrationFragment = new AdminUserAdministrationFragment();
+
+        FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, workerAdministrationFragment, Constants.TAG_WORKER_ADMINISTRATION);
         fragmentTransaction.commit();
     }
 }

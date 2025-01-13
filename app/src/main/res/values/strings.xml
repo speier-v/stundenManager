@@ -57,4 +57,9 @@
     <string name="startDate">Start date</string>
     <string name="endDate">End date</string>
     <string name="status">Status</string>
+    <string name="administration">Administration</string>
+    <string name="userDetails">User Details</string>
+    <string name="back">Back</string>
+    <string name="approval">Approval</string>
+    <string name="checked_vacation_or_illness">Gecheckte Urlaub-/Krankheitstage</string>
 </resources>

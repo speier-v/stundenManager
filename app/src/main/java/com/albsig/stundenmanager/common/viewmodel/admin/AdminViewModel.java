@@ -14,12 +14,16 @@ import com.albsig.stundenmanager.domain.repository.UserRepository;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class AdminViewModel extends ViewModel {
 
     private static final String TAG = "UserViewModel";
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private MutableLiveData<Result<UserModel>> userModelResult = new MutableLiveData<>();
+    private MutableLiveData<Result<List<UserModel>>> userListResult = new MutableLiveData<>();
+    private MutableLiveData<UserModel> userDetailModel = new MutableLiveData<>();
 
     public AdminViewModel(AdminRepository adminRepository, UserRepository userRepository) {
         this.adminRepository = adminRepository;
@@ -28,6 +32,10 @@ public class AdminViewModel extends ViewModel {
 
     public LiveData<Result<UserModel>> getUserModel() {
         return userModelResult;
+    }
+
+    public LiveData<Result<List<UserModel>>> getUserList() {
+        return userListResult;
     }
 
     public void loginAdmin(JSONObject userData) {
@@ -60,5 +68,31 @@ public class AdminViewModel extends ViewModel {
                 Log.d(TAG, "Logout did not work. Try again later!");
             }
         });
+    }
+
+    public void getUsers() {
+        adminRepository.getUsers(new ResultCallback<List<UserModel>>() {
+            @Override
+            public void onSuccess(Result<List<UserModel>> response) {
+                userListResult.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<List<UserModel>> error) {
+
+            }
+        });
+    }
+
+    public void setUserModel(UserModel userModel) {
+        userDetailModel.setValue(userModel);
+    }
+
+    public LiveData<UserModel> getUserDetailModel() {
+        return userDetailModel;
+    }
+
+    public void clearUserDetailModel() {
+        userDetailModel = new MutableLiveData<>();
     }
 }
