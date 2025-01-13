@@ -175,7 +175,7 @@ public class UserRepositoryImpl implements UserRepository {
                     return;
                 }
 
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                for (DocumentSnapshot document : task2.getResult().getDocuments()) {
                     Log.d(TAG, document.getId() + " => " + document.getData());
                     String docId = document.getId();
                     Timestamp startDate = (Timestamp) document.get("startDate");

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.domain.repository.AdminRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
 
@@ -23,7 +24,9 @@ public class AdminViewModel extends ViewModel {
     private final AdminRepository adminRepository;
     private MutableLiveData<Result<UserModel>> userModelResult = new MutableLiveData<>();
     private MutableLiveData<Result<List<UserModel>>> userListResult = new MutableLiveData<>();
+
     private MutableLiveData<UserModel> userDetailModel = new MutableLiveData<>();
+    private MutableLiveData<Result<List<VIModel>>> checkedVIList = new MutableLiveData<>();
 
     public AdminViewModel(AdminRepository adminRepository, UserRepository userRepository) {
         this.adminRepository = adminRepository;
@@ -36,6 +39,10 @@ public class AdminViewModel extends ViewModel {
 
     public LiveData<Result<List<UserModel>>> getUserList() {
         return userListResult;
+    }
+
+    public LiveData<Result<List<VIModel>>> getCheckedVIList() {
+        return checkedVIList;
     }
 
     public void loginAdmin(JSONObject userData) {
@@ -94,5 +101,20 @@ public class AdminViewModel extends ViewModel {
 
     public void clearUserDetailModel() {
         userDetailModel = new MutableLiveData<>();
+    }
+
+    public void getCheckedVIList(String uid) {
+        adminRepository.getCheckedVIList(uid, new ResultCallback<List<VIModel>>() {
+
+            @Override
+            public void onSuccess(Result<List<VIModel>> response) {
+                checkedVIList.setValue(response);
+            }
+
+            @Override
+            public void onError(Result<List<VIModel>> error) {
+                Log.d(TAG, "getCheckedVIList failed " + error.getError().toString());
+            }
+        });
     }
 }

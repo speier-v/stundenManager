@@ -12,12 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminUserDetailsBinding;
 import com.albsig.stundenmanager.ui.adminworkeradministration.AdminUserAdministrationFragment;
+import com.albsig.stundenmanager.ui.vacationillness.VIAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class AdminUserDetailsFragment extends Fragment {
@@ -26,6 +28,9 @@ public class AdminUserDetailsFragment extends Fragment {
     Context mContext;
     FragmentAdminUserDetailsBinding binding;
     AdminViewModel adminViewModel;
+    RecyclerView rvApproval;
+    RecyclerView rvVI;
+    VIAdapter viAdapter;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -52,6 +57,13 @@ public class AdminUserDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navigateBack();
         initObserver();
+        initRecyclerVI();
+    }
+
+    private void initRecyclerVI() {
+        rvVI = binding.rvVI;
+        viAdapter = new VIAdapter();
+        rvVI.setAdapter(viAdapter);
     }
 
     private void initObserver() {
@@ -61,6 +73,17 @@ public class AdminUserDetailsFragment extends Fragment {
             }
 
             Log.d(TAG, userModel.toString());
+            binding.tvName.setText(userModel.getName());
+            binding.tvSurname.setText(userModel.getSurname());
+            adminViewModel.getCheckedVIList(userModel.getUid());
+        });
+
+        adminViewModel.getCheckedVIList().observe(getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                return;
+            }
+
+            viAdapter.updateData(result.getValue());
         });
     }
 
