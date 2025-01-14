@@ -87,9 +87,9 @@ public class ShiftRepositoryImpl implements ShiftRepository {
                 List<ShiftModel> shiftModels = new ArrayList<>();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     // Extract shift fields
-                    List<DocumentReference> morningShift = (List<DocumentReference>) document.get("morningShift");
-                    List<DocumentReference> lateShift = (List<DocumentReference>) document.get("lateShift");
-                    List<DocumentReference> nightShift = (List<DocumentReference>) document.get("nightShift");
+                    List<String> morningShift = (List<String>) document.get("morningShift");
+                    List<String> lateShift = (List<String>) document.get("lateShift");
+                    List<String> nightShift = (List<String>) document.get("nightShift");
 
                     // Check if the user is in morning shifts
                     if (morningShift != null && isUserInShift(morningShift, uid)) {
@@ -115,39 +115,18 @@ public class ShiftRepositoryImpl implements ShiftRepository {
                 Log.d(TAG, "Couldn't fetch shifts");
             }
         });
-
-        /*
-        firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.SESSIONS_COLLECTION).get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                Log.d(TAG, "Get shifts failed");
-                resultCallback.onError(Result.error(task.getException()));
-                return;
-            }
-
-            if (task.getResult() == null) {
-                Log.d(TAG, "Get shifts failed");
-                resultCallback.onError(Result.error(new Exception("Shift-List is null")));
-                return;
-            }
-
-            List<ShiftModel> shiftModels = new ArrayList<>();
-            for (DocumentSnapshot document : task.getResult()) {
-                ShiftModel shiftModel = document.toObject(ShiftModel.class);
-                assert shiftModel != null;
-                shiftModels.add(shiftModel);
-            }
-            Log.d(TAG, "Get shifts successful");
-            resultCallback.onSuccess(Result.success(shiftModels));
-        });
-         */
     }
 
-    private boolean isUserInShift(List<DocumentReference> shiftList, String userUid) {
+    private boolean isUserInShift(List<String> shiftList, String userUid) {
         if (shiftList == null) return false;
 
-        for (DocumentReference userRef : shiftList) {
-            if (userRef != null && userRef.getId().equals(userUid)) {
-                return true;
+        for (String userPath : shiftList) {
+            if (userPath != null && userPath.startsWith("/users/")) {
+                // Extract the user ID from the path
+                String userId = userPath.substring("/users/".length());
+                if (userId.equals(userUid)) {
+                    return true;
+                }
             }
         }
         return false;

@@ -47,4 +47,13 @@ public class SessionModel implements Serializable {
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
     }
+
+    public int getDurationInMinutes() {
+        if (startTime == null || endTime == null) {
+            return 0;
+        }
+
+        long durationMillis = endTime.toDate().getTime() - startTime.toDate().getTime();
+        return (int) (durationMillis / (1000 * 60));
+    }
 }

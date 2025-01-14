@@ -153,7 +153,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void getVIList(String uid, ResultCallback<List<VIModel>> resultCallback) {
-        List<VIModel> viList = new ArrayList<>();
+        List<VIModel> viList = new ArrayList<VIModel>();
         firebaseFirestore.collection(Constants.USERS_COLLECTION).document(uid).collection(Constants.VACATION_COLLECTION).get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 resultCallback.onError(Result.error(task.getException()));

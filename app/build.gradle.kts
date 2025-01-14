@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -52,6 +51,7 @@ dependencies {
     implementation(libs.support.annotations)
     implementation(libs.firebase.database)
     implementation(libs.androidx.lifecycle.viewmodel.android)
+    implementation(libs.play.services.base)
     testImplementation(libs.junit)
     testImplementation(libs.espresso.core)
     testImplementation(libs.mockito.core)
@@ -63,4 +63,5 @@ dependencies {
     implementation(platform(libs.firebase.bom.v3351))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.functions)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
