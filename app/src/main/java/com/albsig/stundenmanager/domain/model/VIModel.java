@@ -42,4 +42,12 @@ public class VIModel {
     public Timestamp getEndDate() {
         return endDate;
     }
+
+    public String getDocId() {
+        return docId;
+    }
+
+    public String getUid() {
+        return uid;
+    }
 }

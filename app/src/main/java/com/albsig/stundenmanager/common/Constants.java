@@ -11,6 +11,9 @@ public class Constants {
     public static final String TAG_VACATION_ILLNESS = "VacationIllness";
     public static final String HTTP_CALLABLE_REF_CREATE_VACATION = "createVacation";
     public static final String HTTP_CALLABLE_REF_CREATE_ILLNESS = "createIllness";
+    public static final String TAG_WORKER_ADMINISTRATION = "WorkerAdministration";
+    public static final String TAG_USER_DETAILS = "UserDetails";
+    public static final String FIELD_APPROVAL = "approval";
     public static String TAG_ADMIN_DASHBOARD = "AdminDashboard";
 
     public static final String USER_MODEL_ID = "uid";
@@ -54,5 +57,6 @@ public class Constants {
     public static final String APPROVAL_TYPE = "Vacation";
     public static final String APPROVAL_TYPE_ILLNESS = "Illness";
     public static final String APPROVAL_STATUS_CHECK = "check";
-    public static final String APPROVAL_STATUS_ACCEPTED = "accepted";
+    public static final String APPROVAL_STATUS_APPROVED = "approved";
+    public static final String APPROVAL_STATUS_DENIED = "denied";
 }
