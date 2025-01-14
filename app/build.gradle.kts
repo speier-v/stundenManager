@@ -64,4 +64,5 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.functions)
     implementation(libs.mp.android.chart)
+    implementation (libs.pdfcreatorandroid)
 }

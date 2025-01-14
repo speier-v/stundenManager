@@ -62,4 +62,5 @@
     <string name="back">Back</string>
     <string name="approval">Approval</string>
     <string name="checked_vacation_or_illness">Gecheckte Urlaub-/Krankheitstage</string>
+    <string name="createReport">Create report</string>
 </resources>

@@ -11,6 +11,7 @@ material = "1.12.0"
 activity = "1.9.2"
 constraintlayout = "2.1.4"
 materialVersion = "1.7.0"
+pdfcreatorandroid = "3.0.2"
 playServicesTasks = "18.2.0"
 firebaseFirestore = "25.1.0"
 navigationFragment = "2.8.3"
@@ -33,6 +34,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v170 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+pdfcreatorandroid = { module = "com.github.tejpratap46:PDFCreatorAndroid", version.ref = "pdfcreatorandroid" }
 play-services-tasks = { group = "com.google.android.gms", name = "play-services-tasks", version.ref = "playServicesTasks" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
