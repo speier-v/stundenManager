@@ -12,6 +12,7 @@ public class SessionModel implements Serializable {
     Timestamp startTime;
     Timestamp endTime;
     List<BreakModel> breaks;
+    String uid;
 
     public SessionModel() {}
 
@@ -55,5 +56,13 @@ public class SessionModel implements Serializable {
 
         long durationMillis = endTime.toDate().getTime() - startTime.toDate().getTime();
         return (int) (durationMillis / (1000 * 60));
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

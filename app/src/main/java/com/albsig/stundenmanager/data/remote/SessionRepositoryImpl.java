@@ -1,5 +1,7 @@
 package com.albsig.stundenmanager.data.remote;
 
+import static com.google.android.gms.tasks.Task.*;
+
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -10,6 +12,8 @@ import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.domain.model.session.BreakModel;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.SessionRepository;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
@@ -132,6 +136,7 @@ public class SessionRepositoryImpl implements SessionRepository {
                 SessionModel sessionModel = document.toObject(SessionModel.class);
                 assert sessionModel != null;
                 sessionModel.setDocumentId(document.getId());
+                sessionModel.setUid(uid);
                 sessionModels.add(sessionModel);
             }
             Log.d(TAG, "Get sessions successful");
@@ -139,32 +144,64 @@ public class SessionRepositoryImpl implements SessionRepository {
         });
     }
 
-    @Override
     public void getAllSessions(ResultCallback<List<SessionModel>> resultCallback) {
         Log.d(TAG, "Get all sessions");
-        firebaseFirestore.collectionGroup(Constants.SESSIONS_COLLECTION).get().addOnCompleteListener(task -> {
+
+        firebaseFirestore.collection(Constants.USERS_COLLECTION).get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
-                Log.d(TAG, "Get sessions failed");
+                Log.d(TAG, "Get users failed");
                 resultCallback.onError(Result.error(task.getException()));
                 return;
             }
 
             if (task.getResult() == null) {
-                Log.d(TAG, "Get sessions failed");
-                resultCallback.onError(Result.error(new Exception("Session-List is null")));
+                Log.d(TAG, "Get users failed");
+                resultCallback.onError(Result.error(new Exception("User list is null")));
                 return;
             }
 
-            List<SessionModel> sessionModels = new ArrayList<>();
-            for (DocumentSnapshot document : task.getResult()) {
-                SessionModel sessionModel = document.toObject(SessionModel.class);
-                assert sessionModel != null;
-                sessionModel.setDocumentId(document.getId());
-                sessionModels.add(sessionModel);
+            List<SessionModel> allSessionModels = new ArrayList<>();
+            List<DocumentSnapshot> userDocuments = task.getResult().getDocuments();
+
+            if (userDocuments.isEmpty()) {
+                Log.d(TAG, "No users found");
+                resultCallback.onSuccess(Result.success(allSessionModels));
+                return;
             }
 
-            Log.d(TAG, "Get sessions successful");
-            resultCallback.onSuccess(Result.success(sessionModels));
+            // Use a counter to track the number of completed user session fetches
+            final int[] pendingRequests = {userDocuments.size()};
+
+            for (DocumentSnapshot userDocument : userDocuments) {
+                String uid = userDocument.getId();
+                firebaseFirestore.collection(Constants.USERS_COLLECTION)
+                        .document(uid)
+                        .collection(Constants.SESSIONS_COLLECTION)
+                        .get()
+                        .addOnCompleteListener(sessionTask -> {
+                            if (sessionTask.isSuccessful() && sessionTask.getResult() != null) {
+                                for (DocumentSnapshot sessionDoc : sessionTask.getResult()) {
+                                    SessionModel sessionModel = sessionDoc.toObject(SessionModel.class);
+                                    if (sessionModel != null) {
+                                        sessionModel.setDocumentId(sessionDoc.getId());
+                                        sessionModel.setUid(uid);
+                                        allSessionModels.add(sessionModel);
+                                    }
+                                }
+                            } else {
+                                Log.d(TAG, "Fetching sessions failed for user: " + uid, sessionTask.getException());
+                            }
+
+                            // Decrement the counter and check if all requests are done
+                            synchronized (pendingRequests) {
+                                pendingRequests[0]--;
+                                if (pendingRequests[0] == 0) {
+                                    Log.d(TAG, "All user sessions fetched");
+                                    resultCallback.onSuccess(Result.success(allSessionModels));
+                                }
+                            }
+                        });
+            }
         });
     }
 

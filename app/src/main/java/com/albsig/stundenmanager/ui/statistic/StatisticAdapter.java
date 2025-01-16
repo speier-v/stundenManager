@@ -76,6 +76,8 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.View
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        //xAxis.setAvoidFirstLastClipping(true);
+        //xAxis.setLabelCount(5, true);
 
         // Configure Y-Axis
         YAxis yAxis = barChart.getAxisLeft();

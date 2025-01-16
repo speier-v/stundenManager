@@ -154,13 +154,13 @@ public class StatisticFragment extends Fragment {
         List<UserStatistic> statistics = new ArrayList<>();
 
         if (users == null || sessions == null || shifts == null) {
-            Log.d("hi", "return because of null value: "+users+", "+sessions+", "+shifts);
+            //Log.d("hi", "return because of null value: "+users+", "+sessions+", "+shifts);
             return statistics;
         }
-        Log.d("hi", "continuing with values: "+users+", "+sessions+", "+shifts);
+        //Log.d("hi", "continuing with values: "+users+", "+sessions+", "+shifts);
 
         for (UserModel user : users) {
-            Log.d("hi", "loop with user: "+user);
+            //Log.d("hi", "loop with user: " + user.getName());
             String userId = user.getUid();
             String userName = user.getName();
 
@@ -171,60 +171,57 @@ public class StatisticFragment extends Fragment {
                     userShifts.add(shift);
                 }
             }
-            Log.d("hi", "found following shifts for user: "+shifts);
+            //Log.d("hi", "found following shifts for user: " + shifts);
 
             List<SessionModel> userSessions = new ArrayList<>();
-            sessionRepository.getSessions(userId, new ResultCallback<List<SessionModel>>() {
-                @Override
-                public void onSuccess(Result<List<SessionModel>> result) {
-                    if (result.isSuccess()) {
-                        sessions = result.getValue();
-                        Log.d("hi", "found following sessions for user: "+sessions);
-
-                        for (SessionModel session : sessions) {
-                            userSessions.add(session);
-                            Log.d("hi", "loop for session: "+session);
-
-                            // DONE
-                            Map<ShiftModel, List<SessionModel>> shiftToSessionsMap = mapSessionsToShifts(userShifts, userSessions);
-                            Log.d("hi", "matched following sessions to shift: "+shiftToSessionsMap);
-
-                            // DONE
-                            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
-                            Log.d("hi", "calculated following expected time per week: "+expectedTimePerWeek);
-
-                            // DONE
-                            Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
-                            Log.d("hi", "calculated following actual time per week");
-
-                            // DONE
-                            alignWeeklyTimes(expectedTimePerWeek, actualTimePerWeek);
-
-                            // DONE
-                            List<String> shiftDateLabels = new ArrayList<>();
-                            for (ShiftModel shift : userShifts) {
-                                String formattedDate = formatShiftDate(shift.getStart().toString(), shift.getEnd().toString());
-                                shiftDateLabels.add(formattedDate);
-                            }
-                            Log.d("hi", "assigned the following labels: "+shiftDateLabels);
-
-                            // DONE
-                            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek, shiftDateLabels));
-                        }
-                    } else {
-                        // Handle the error if the result is not successful
-                    }
+            for (SessionModel session : sessions) {
+                if (session.getUid().equals(userId)) {
+                    userSessions.add(session);
                 }
+                //Log.d("hi", "loop for session: " + session);
+            }
 
-                @Override
-                public void onError(Result<List<SessionModel>> result) {
-                    // Handle error (e.g., show an error message)
-                }
-            });
+            // DONE
+            Map<ShiftModel, List<SessionModel>> shiftToSessionsMap = mapSessionsToShifts(userShifts, userSessions);
+            //Log.d("hi", "matched following sessions to shift: " + shiftToSessionsMap);
+
+            // DONE
+            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
+            //Log.d("hi", "calculated following expected time per week: " + expectedTimePerWeek);
+
+            // DONE
+            Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
+            //Log.d("hi", "calculated following actual time per week");
+
+            // DONE
+            alignWeeklyTimes(expectedTimePerWeek, actualTimePerWeek);
+
+            // DONE
+            List<String> shiftDateLabels = new ArrayList<>();
+            for (ShiftModel shift : userShifts) {
+                Log.d("hi", "startDate: "+shift.getStart()+", endDate: "+shift.getEnd());
+                String formattedDate = formatShiftDate(shift.getStart(), shift.getEnd());
+                Log.d("hi", formattedDate);
+                shiftDateLabels.add(formattedDate);
+            }
+            //Log.d("hi", "assigned the following labels: " + shiftDateLabels);
+
+            // DONE
+            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek, shiftDateLabels));
         }
-
         Log.d("hi", "returning following statistics: "+statistics);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        allStatistics = statistics;
+        filteredStatistics = new ArrayList<>(allStatistics);
+
+        adapter = new StatisticAdapter(filteredStatistics);
+        recyclerView.setAdapter(adapter);
         return statistics;
+    }
+
+    private String formatShiftDate(Date startDate, Date endDate) {
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
+        return outputFormat.format(startDate) + " \n - \n " + outputFormat.format(endDate);
     }
 
     private String formatShiftDate(String start, String end) {
