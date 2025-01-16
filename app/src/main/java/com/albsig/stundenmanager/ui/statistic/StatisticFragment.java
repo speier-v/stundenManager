@@ -1,9 +1,14 @@
 package com.albsig.stundenmanager.ui.statistic;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -35,6 +40,9 @@ public class StatisticFragment extends Fragment {
     private List<String[]> dummyShifts;
     private List<String[]> dummySessions;
 
+    private EditText searchBar;
+    private List<UserStatistic> allStatistics; // Original list
+    private List<UserStatistic> filteredStatistics; // Filtered list
 
     @Nullable
     @Override
@@ -45,12 +53,85 @@ public class StatisticFragment extends Fragment {
         initializeDummyData();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        List<UserStatistic> statistics = fetchStatistics();
-        adapter = new StatisticAdapter(statistics);
+        //List<UserStatistic> statistics = fetchStatistics();
+        searchBar = view.findViewById(R.id.search_bar);
+        allStatistics = fetchStatistics();
+        filteredStatistics = new ArrayList<>(allStatistics);
+
+        adapter = new StatisticAdapter(filteredStatistics);
         recyclerView.setAdapter(adapter);
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterStatistics(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
 
         return view;
     }
+
+    private void filterStatistics(String query) {
+        filteredStatistics.clear();
+
+        if (query.isEmpty()) {
+            // If the query is empty, reset to the full list
+            filteredStatistics.addAll(allStatistics);
+        } else {
+            for (UserStatistic stat : allStatistics) {
+                // Find matching labels and their indices
+                List<String> matchingLabels = new ArrayList<>();
+                List<Integer> matchingIndices = new ArrayList<>();
+
+                List<String> labels = stat.getShiftDateLabels();
+                for (int i = 0; i < labels.size(); i++) {
+                    Log.d("hi", "checking label: "+labels.get(i));
+                    if (labels.get(i).toLowerCase().contains(query.toLowerCase())) {
+                        Log.d("hi", "contained");
+                        matchingLabels.add(labels.get(i));
+                        matchingIndices.add(i);
+                    }
+                }
+
+                if (!matchingLabels.isEmpty()) {
+                    // Filter expected and actual time maps based on matching indices
+                    Map<String, Integer> filteredExpectedTime = new HashMap<>();
+                    Map<String, Integer> filteredActualTime = new HashMap<>();
+
+                    List<String> allWeeks = new ArrayList<>(stat.getExpectedTimePerWeek().keySet());
+                    for (int index : matchingIndices) {
+                        if (index < allWeeks.size()) {
+                            String week = allWeeks.get(index);
+                            if (stat.getExpectedTimePerWeek().containsKey(week)) {
+                                filteredExpectedTime.put(week, stat.getExpectedTimePerWeek().get(week));
+                            }
+                            if (stat.getActualTimePerWeek().containsKey(week)) {
+                                filteredActualTime.put(week, stat.getActualTimePerWeek().get(week));
+                            }
+                        }
+                    }
+
+                    // Create a new filtered UserStatistic
+                    filteredStatistics.add(new UserStatistic(
+                            stat.getUserName(),
+                            filteredExpectedTime,
+                            filteredActualTime,
+                            matchingLabels
+                    ));
+                }
+            }
+        }
+
+        // Notify the adapter of data changes
+        adapter.notifyDataSetChanged();
+    }
+
 
     private List<UserStatistic> fetchStatistics() {
         List<UserStatistic> statistics = new ArrayList<>();
