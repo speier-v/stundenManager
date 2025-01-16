@@ -94,18 +94,81 @@ public class ShiftRepositoryImpl implements ShiftRepository {
                     // Check if the user is in morning shifts
                     if (morningShift != null && isUserInShift(morningShift, uid)) {
                         ShiftModel shiftModel = new ShiftModel("Morning", document);
+                        shiftModel.setUid(uid);
                         shiftModels.add(shiftModel);
                     }
 
                     // Check if the user is in late shifts
                     if (lateShift != null && isUserInShift(lateShift, uid)) {
                         ShiftModel shiftModel = new ShiftModel("Late", document);
+                        shiftModel.setUid(uid);
                         shiftModels.add(shiftModel);
                     }
 
                     // Check if the user is in night shifts
                     if (nightShift != null && isUserInShift(nightShift, uid)) {
                         ShiftModel shiftModel = new ShiftModel("Night", document);
+                        shiftModel.setUid(uid);
+                        shiftModels.add(shiftModel);
+                    }
+                }
+
+                resultCallback.onSuccess(Result.success(shiftModels));
+            } else {
+                Log.d(TAG, "Couldn't fetch shifts");
+            }
+        });
+    }
+
+    @Override
+    public void getAllShifts(ResultCallback<List<ShiftModel>> resultCallback) {
+        Log.d(TAG, "Get shifts");
+
+        firebaseFirestore.collection("shifts").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<ShiftModel> shiftModels = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    // Extract shift fields
+                    List<String> morningShift = (List<String>) document.get("morningShift");
+                    List<String> lateShift = (List<String>) document.get("lateShift");
+                    List<String> nightShift = (List<String>) document.get("nightShift");
+
+                    // Check if the user is in morning shifts
+                    if (morningShift != null) {
+                        ShiftModel shiftModel = new ShiftModel("Morning", document);
+                        for (String userPath : morningShift) {
+                            if (userPath != null && userPath.startsWith("/users/")) {
+                                // Extract the user ID from the path
+                                String userId = userPath.substring("/users/".length());
+                                shiftModel.setUid(userId);
+                            }
+                        }
+                        shiftModels.add(shiftModel);
+                    }
+
+                    // Check if the user is in late shifts
+                    if (lateShift != null) {
+                        ShiftModel shiftModel = new ShiftModel("Late", document);
+                        for (String userPath : lateShift) {
+                            if (userPath != null && userPath.startsWith("/users/")) {
+                                // Extract the user ID from the path
+                                String userId = userPath.substring("/users/".length());
+                                shiftModel.setUid(userId);
+                            }
+                        }
+                        shiftModels.add(shiftModel);
+                    }
+
+                    // Check if the user is in night shifts
+                    if (nightShift != null) {
+                        ShiftModel shiftModel = new ShiftModel("Night", document);
+                        for (String userPath : nightShift) {
+                            if (userPath != null && userPath.startsWith("/users/")) {
+                                // Extract the user ID from the path
+                                String userId = userPath.substring("/users/".length());
+                                shiftModel.setUid(userId);
+                            }
+                        }
                         shiftModels.add(shiftModel);
                     }
                 }

@@ -140,6 +140,35 @@ public class SessionRepositoryImpl implements SessionRepository {
     }
 
     @Override
+    public void getAllSessions(ResultCallback<List<SessionModel>> resultCallback) {
+        Log.d(TAG, "Get all sessions");
+        firebaseFirestore.collectionGroup(Constants.SESSIONS_COLLECTION).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.d(TAG, "Get sessions failed");
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            if (task.getResult() == null) {
+                Log.d(TAG, "Get sessions failed");
+                resultCallback.onError(Result.error(new Exception("Session-List is null")));
+                return;
+            }
+
+            List<SessionModel> sessionModels = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                SessionModel sessionModel = document.toObject(SessionModel.class);
+                assert sessionModel != null;
+                sessionModel.setDocumentId(document.getId());
+                sessionModels.add(sessionModel);
+            }
+
+            Log.d(TAG, "Get sessions successful");
+            resultCallback.onSuccess(Result.success(sessionModels));
+        });
+    }
+
+    @Override
     public void updateSession(JSONObject sessionData, ResultCallback<SessionModel> resultCallback) {
 
     }

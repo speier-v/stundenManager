@@ -16,9 +16,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albsig.stundenmanager.R;
+import com.albsig.stundenmanager.common.callbacks.Result;
+import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.data.remote.SessionRepositoryImpl;
+import com.albsig.stundenmanager.data.remote.ShiftRepositoryImpl;
+import com.albsig.stundenmanager.data.remote.UserRepositoryImpl;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.model.session.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.albsig.stundenmanager.domain.repository.SessionRepository;
+import com.albsig.stundenmanager.domain.repository.ShiftRepository;
+import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
@@ -39,6 +47,12 @@ public class StatisticFragment extends Fragment {
     private List<String[]> dummyUsers;
     private List<String[]> dummyShifts;
     private List<String[]> dummySessions;
+    private List<UserModel> users;
+    private List<ShiftModel> shifts;
+    private List<SessionModel> sessions;
+    private UserRepository userRepository;
+    private ShiftRepository shiftRepository;
+    private SessionRepository sessionRepository;
 
     private EditText searchBar;
     private List<UserStatistic> allStatistics; // Original list
@@ -50,10 +64,13 @@ public class StatisticFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_statistic, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
 
-        initializeDummyData();
+        userRepository = new UserRepositoryImpl(view.getContext());
+        shiftRepository = new ShiftRepositoryImpl();
+        sessionRepository = new SessionRepositoryImpl();
+        //initializeDummyData();
+        initializeData();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        //List<UserStatistic> statistics = fetchStatistics();
         searchBar = view.findViewById(R.id.search_bar);
         allStatistics = fetchStatistics();
         filteredStatistics = new ArrayList<>(allStatistics);
@@ -136,46 +153,77 @@ public class StatisticFragment extends Fragment {
     private List<UserStatistic> fetchStatistics() {
         List<UserStatistic> statistics = new ArrayList<>();
 
-        for (String[] user : dummyUsers) {
-            String userId = user[0];
-            String userName = user[1];
+        if (users == null || sessions == null || shifts == null) {
+            Log.d("hi", "return because of null value: "+users+", "+sessions+", "+shifts);
+            return statistics;
+        }
+        Log.d("hi", "continuing with values: "+users+", "+sessions+", "+shifts);
+
+        for (UserModel user : users) {
+            Log.d("hi", "loop with user: "+user);
+            String userId = user.getUid();
+            String userName = user.getName();
 
             // Filter shifts and sessions for the current user
-            List<String[]> userShifts = new ArrayList<>();
-            for (String[] shift : dummyShifts) {
-                if (shift[0].equals(userId)) {
+            List<ShiftModel> userShifts = new ArrayList<>();
+            for (ShiftModel shift : shifts) {
+                if (shift.getUid().equals(userId)) {
                     userShifts.add(shift);
                 }
             }
+            Log.d("hi", "found following shifts for user: "+shifts);
 
-            List<String[]> userSessions = new ArrayList<>();
-            for (String[] session : dummySessions) {
-                if (session[0].equals(userId)) {
-                    userSessions.add(session);
+            List<SessionModel> userSessions = new ArrayList<>();
+            sessionRepository.getSessions(userId, new ResultCallback<List<SessionModel>>() {
+                @Override
+                public void onSuccess(Result<List<SessionModel>> result) {
+                    if (result.isSuccess()) {
+                        sessions = result.getValue();
+                        Log.d("hi", "found following sessions for user: "+sessions);
+
+                        for (SessionModel session : sessions) {
+                            userSessions.add(session);
+                            Log.d("hi", "loop for session: "+session);
+
+                            // DONE
+                            Map<ShiftModel, List<SessionModel>> shiftToSessionsMap = mapSessionsToShifts(userShifts, userSessions);
+                            Log.d("hi", "matched following sessions to shift: "+shiftToSessionsMap);
+
+                            // DONE
+                            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
+                            Log.d("hi", "calculated following expected time per week: "+expectedTimePerWeek);
+
+                            // DONE
+                            Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
+                            Log.d("hi", "calculated following actual time per week");
+
+                            // DONE
+                            alignWeeklyTimes(expectedTimePerWeek, actualTimePerWeek);
+
+                            // DONE
+                            List<String> shiftDateLabels = new ArrayList<>();
+                            for (ShiftModel shift : userShifts) {
+                                String formattedDate = formatShiftDate(shift.getStart().toString(), shift.getEnd().toString());
+                                shiftDateLabels.add(formattedDate);
+                            }
+                            Log.d("hi", "assigned the following labels: "+shiftDateLabels);
+
+                            // DONE
+                            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek, shiftDateLabels));
+                        }
+                    } else {
+                        // Handle the error if the result is not successful
+                    }
                 }
-            }
 
-            // Map sessions to shifts
-            Map<String[], List<String[]>> shiftToSessionsMap = mapSessionsToShifts(userShifts, userSessions);
-
-            // Calculate expected and actual time per week
-            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
-            Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
-
-            // Ensure all weeks are aligned
-            alignWeeklyTimes(expectedTimePerWeek, actualTimePerWeek);
-
-            // Prepare date labels
-            List<String> shiftDateLabels = new ArrayList<>();
-            for (String[] shift : userShifts) {
-                String formattedDate = formatShiftDate(shift[1], shift[2]);
-                shiftDateLabels.add(formattedDate);
-            }
-
-            // Add user statistic
-            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek, shiftDateLabels));
+                @Override
+                public void onError(Result<List<SessionModel>> result) {
+                    // Handle error (e.g., show an error message)
+                }
+            });
         }
 
+        Log.d("hi", "returning following statistics: "+statistics);
         return statistics;
     }
 
@@ -192,17 +240,17 @@ public class StatisticFragment extends Fragment {
         }
     }
 
-    private Map<String[], List<String[]>> mapSessionsToShifts(List<String[]> shifts, List<String[]> sessions) {
-        Map<String[], List<String[]>> shiftToSessionsMap = new HashMap<>();
+    private Map<ShiftModel, List<SessionModel>> mapSessionsToShifts(List<ShiftModel> shifts, List<SessionModel> sessions) {
+        Map<ShiftModel, List<SessionModel>> shiftToSessionsMap = new HashMap<>();
 
-        for (String[] shift : shifts) {
-            String shiftStart = shift[1];
-            String shiftEnd = shift[2];
+        for (ShiftModel shift : shifts) {
+            Date shiftStart = shift.getStart();
+            Date shiftEnd = shift.getEnd();
 
             // Find matching sessions for the shift
-            List<String[]> matchingSessions = new ArrayList<>();
-            for (String[] session : sessions) {
-                String sessionStart = session[1];
+            List<SessionModel> matchingSessions = new ArrayList<>();
+            for (SessionModel session : sessions) {
+                Date sessionStart = session.getStartTime().toDate();
                 if (sessionBelongsToShift(sessionStart, shiftStart, shiftEnd)) {
                     matchingSessions.add(session);
                 }
@@ -214,24 +262,24 @@ public class StatisticFragment extends Fragment {
         return shiftToSessionsMap;
     }
 
-    private boolean sessionBelongsToShift(String sessionStart, String shiftStart, String shiftEnd) {
-        com.google.firebase.Timestamp sessionStartTs = parseTimestamp(sessionStart);
-        com.google.firebase.Timestamp shiftStartTs = parseTimestamp(shiftStart);
-        com.google.firebase.Timestamp shiftEndTs = parseTimestamp(shiftEnd);
+    private boolean sessionBelongsToShift(Date sessionStart, Date shiftStart, Date shiftEnd) {
+        com.google.firebase.Timestamp sessionStartTs = new Timestamp(sessionStart);
+        com.google.firebase.Timestamp shiftStartTs = new Timestamp(shiftStart);
+        com.google.firebase.Timestamp shiftEndTs = new Timestamp(shiftEnd);
 
         return sessionStartTs.compareTo(shiftStartTs) >= 0 && sessionStartTs.compareTo(shiftEndTs) <= 0;
     }
 
-    private Map<String, Integer> calculateWeeklyTimeForShifts(List<String[]> shifts) {
+    private Map<String, Integer> calculateWeeklyTimeForShifts(List<ShiftModel> shifts) {
         Map<String, Integer> weeklyTime = new HashMap<>();
-        for (String[] shift : shifts) {
-            String shiftStart = shift[1];
-            String shiftEnd = shift[2];
-            String week = getWeekOfYear(parseDate(shiftStart));
+        for (ShiftModel shift : shifts) {
+            Date shiftStart = shift.getStart();
+            Date shiftEnd = shift.getEnd();
+            String week = getWeekOfYear(shiftStart);
 
             // Calculate duration in minutes
-            com.google.firebase.Timestamp shiftStartTs = parseTimestamp(shiftStart);
-            com.google.firebase.Timestamp shiftEndTs = parseTimestamp(shiftEnd);
+            com.google.firebase.Timestamp shiftStartTs = new Timestamp(shiftStart);
+            com.google.firebase.Timestamp shiftEndTs = new Timestamp(shiftEnd);
             int duration = (int) (shiftEndTs.getSeconds() - shiftStartTs.getSeconds()) / 60;
 
             weeklyTime.put(week, weeklyTime.getOrDefault(week, 0) + duration);
@@ -239,18 +287,18 @@ public class StatisticFragment extends Fragment {
         return weeklyTime;
     }
 
-    private Map<String, Integer> calculateWeeklyTimeForSessions(Map<String[], List<String[]>> shiftToSessionsMap) {
+    private Map<String, Integer> calculateWeeklyTimeForSessions(Map<ShiftModel, List<SessionModel>> shiftToSessionsMap) {
         Map<String, Integer> weeklyTime = new HashMap<>();
 
-        for (Map.Entry<String[], List<String[]>> entry : shiftToSessionsMap.entrySet()) {
-            String[] shift = entry.getKey();
-            List<String[]> sessions = entry.getValue();
-            String week = getWeekOfYear(parseDate(shift[1])); // Use the shift's start date for the week
+        for (Map.Entry<ShiftModel, List<SessionModel>> entry : shiftToSessionsMap.entrySet()) {
+            ShiftModel shift = entry.getKey();
+            List<SessionModel> sessions = entry.getValue();
+            String week = getWeekOfYear(shift.getStart()); // Use the shift's start date for the week
 
             // Calculate total session duration for this shift
             int totalSessionDuration = 0;
-            for (String[] session : sessions) {
-                totalSessionDuration += Integer.parseInt(session[2]); // Session duration in minutes
+            for (SessionModel session : sessions) {
+                totalSessionDuration += session.getDurationInMinutes(); // Session duration in minutes
             }
 
             // Add the duration to the week's total
@@ -345,5 +393,76 @@ public class StatisticFragment extends Fragment {
             e.printStackTrace();
             return null; // Handle parse error
         }
+    }
+
+    private void initializeData() {
+        userRepository.getUsers(new ResultCallback<List<UserModel>>() {
+            @Override
+            public void onSuccess(Result<List<UserModel>> result) {
+                if (result.isSuccess()) {
+                    users = result.getValue();
+                    // Handle the list of users (e.g., update UI or recyclerView)
+                    //updateUI(users);
+                    Log.d("hi", "fetched users: "+users);
+                    allStatistics = fetchStatistics();
+                    adapter.notifyDataSetChanged();
+                } else {
+                    // Handle the error if the result is not successful
+                    Log.d("error", String.valueOf(result.getError()));
+                }
+            }
+
+            @Override
+            public void onError(Result<List<UserModel>> result) {
+                // Handle error (e.g., show an error message)
+                Log.d("error", String.valueOf(result.getError()));
+            }
+        });
+
+        shiftRepository.getAllShifts(new ResultCallback<List<ShiftModel>>() {
+            @Override
+            public void onSuccess(Result<List<ShiftModel>> result) {
+                if (result.isSuccess()) {
+                    shifts = result.getValue();
+                    // Handle the list of users (e.g., update UI or recyclerView)
+                    //updateUI(users);
+                    Log.d("hi", "fetched shifts: "+shifts);
+                    allStatistics = fetchStatistics();
+                    adapter.notifyDataSetChanged();
+                } else {
+                    // Handle the error if the result is not successful
+                    Log.d("error", String.valueOf(result.getError()));
+                }
+            }
+
+            @Override
+            public void onError(Result<List<ShiftModel>> result) {
+                // Handle error (e.g., show an error message)
+                Log.d("error", String.valueOf(result.getError()));
+            }
+        });
+
+        sessionRepository.getAllSessions(new ResultCallback<List<SessionModel>>() {
+            @Override
+            public void onSuccess(Result<List<SessionModel>> result) {
+                if (result.isSuccess()) {
+                    sessions = result.getValue();
+                    // Handle the list of users (e.g., update UI or recyclerView)
+                    //updateUI(users);
+                    Log.d("hi", "fetched sessions: "+sessions);
+                    allStatistics = fetchStatistics();
+                    adapter.notifyDataSetChanged();
+                } else {
+                    // Handle the error if the result is not successful
+                    Log.d("error", String.valueOf(result.getError()));
+                }
+            }
+
+            @Override
+            public void onError(Result<List<SessionModel>> result) {
+                // Handle error (e.g., show an error message)
+                Log.d("error", String.valueOf(result.getError()));
+            }
+        });
     }
 }

@@ -117,6 +117,33 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public void getUsers(ResultCallback<List<UserModel>> resultCallback) {
+        Log.d(TAG, "Get all users");
+        firebaseFirestore.collection(Constants.USERS_COLLECTION).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.d(TAG, "Get users failed");
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            if (task.getResult() == null || task.getResult().isEmpty()) {
+                Log.d(TAG, "No users found");
+                resultCallback.onError(Result.error(new Exception("User list is empty")));
+                return;
+            }
+
+            List<UserModel> userModels = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                UserModel userModel = new UserModel(document.getId(), document.getString("email"), document);
+                userModels.add(userModel);
+            }
+
+            Log.d(TAG, "Get users successful");
+            resultCallback.onSuccess(Result.success(userModels));
+        });
+    }
+
+    @Override
     public void signOutUser(ResultCallback<Boolean> resultCallback) {
         firebaseAuth.signOut();
         resultCallback.onSuccess(Result.success(true));

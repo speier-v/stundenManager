@@ -17,6 +17,7 @@ public class ShiftModel implements Serializable {
     private String endDate;
     private Date start;
     private Date end;
+    private String uid;
 
     public ShiftModel() {}
 
@@ -41,6 +42,14 @@ public class ShiftModel implements Serializable {
 
     public String getId() {
         return id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getShiftType() {

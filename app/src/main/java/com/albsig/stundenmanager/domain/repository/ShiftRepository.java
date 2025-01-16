@@ -11,6 +11,8 @@ public interface ShiftRepository {
 
     void getShifts(String uid, ResultCallback<List<ShiftModel>> resultCallback);
 
+    void getAllShifts(ResultCallback<List<ShiftModel>> resultCallback);
+
     void updateShift(JSONObject shiftData, ResultCallback<ShiftModel> resultCallback);
 
     void addShiftSnapshotListener(String uid, ResultCallback<List<ShiftModel>> resultCallback);

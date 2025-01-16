@@ -13,6 +13,8 @@ public interface UserRepository {
 
     void updateUser(JSONObject userData, ResultCallback<UserModel> resultCallback);
 
+    void getUsers(ResultCallback<List<UserModel>> resultCallback);
+
     void loginUser(JSONObject userData, ResultCallback<UserModel> resultCallback);
 
     void signOutUser(ResultCallback<Boolean> resultCallback);
