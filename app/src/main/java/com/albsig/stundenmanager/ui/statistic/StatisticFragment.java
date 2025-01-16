@@ -14,6 +14,7 @@ import com.albsig.stundenmanager.R;
 import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.model.session.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
+import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,6 +59,7 @@ public class StatisticFragment extends Fragment {
             String userId = user[0];
             String userName = user[1];
 
+            // Filter shifts and sessions for the current user
             List<String[]> userShifts = new ArrayList<>();
             for (String[] shift : dummyShifts) {
                 if (shift[0].equals(userId)) {
@@ -72,13 +74,87 @@ public class StatisticFragment extends Fragment {
                 }
             }
 
-            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTime(userShifts);
-            Map<String, Integer> actualTimePerWeek = calculateWeeklyTime(userSessions);
+            // Map sessions to shifts
+            Map<String[], List<String[]>> shiftToSessionsMap = mapSessionsToShifts(userShifts, userSessions);
 
+            // Calculate expected and actual time per week
+            Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
+            Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
+
+            // Add user statistic
             statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek));
         }
+
         return statistics;
     }
+
+    private Map<String[], List<String[]>> mapSessionsToShifts(List<String[]> shifts, List<String[]> sessions) {
+        Map<String[], List<String[]>> shiftToSessionsMap = new HashMap<>();
+
+        for (String[] shift : shifts) {
+            String shiftStart = shift[1];
+            String shiftEnd = shift[2];
+
+            // Find matching sessions for the shift
+            List<String[]> matchingSessions = new ArrayList<>();
+            for (String[] session : sessions) {
+                String sessionStart = session[1];
+                if (sessionBelongsToShift(sessionStart, shiftStart, shiftEnd)) {
+                    matchingSessions.add(session);
+                }
+            }
+
+            shiftToSessionsMap.put(shift, matchingSessions);
+        }
+
+        return shiftToSessionsMap;
+    }
+
+    private boolean sessionBelongsToShift(String sessionStart, String shiftStart, String shiftEnd) {
+        com.google.firebase.Timestamp sessionStartTs = parseTimestamp(sessionStart);
+        com.google.firebase.Timestamp shiftStartTs = parseTimestamp(shiftStart);
+        com.google.firebase.Timestamp shiftEndTs = parseTimestamp(shiftEnd);
+
+        return sessionStartTs.compareTo(shiftStartTs) >= 0 && sessionStartTs.compareTo(shiftEndTs) <= 0;
+    }
+
+    private Map<String, Integer> calculateWeeklyTimeForShifts(List<String[]> shifts) {
+        Map<String, Integer> weeklyTime = new HashMap<>();
+        for (String[] shift : shifts) {
+            String shiftStart = shift[1];
+            String shiftEnd = shift[2];
+            String week = getWeekOfYear(parseDate(shiftStart));
+
+            // Calculate duration in minutes
+            com.google.firebase.Timestamp shiftStartTs = parseTimestamp(shiftStart);
+            com.google.firebase.Timestamp shiftEndTs = parseTimestamp(shiftEnd);
+            int duration = (int) (shiftEndTs.getSeconds() - shiftStartTs.getSeconds()) / 60;
+
+            weeklyTime.put(week, weeklyTime.getOrDefault(week, 0) + duration);
+        }
+        return weeklyTime;
+    }
+
+    private Map<String, Integer> calculateWeeklyTimeForSessions(Map<String[], List<String[]>> shiftToSessionsMap) {
+        Map<String, Integer> weeklyTime = new HashMap<>();
+
+        for (Map.Entry<String[], List<String[]>> entry : shiftToSessionsMap.entrySet()) {
+            String[] shift = entry.getKey();
+            List<String[]> sessions = entry.getValue();
+            String week = getWeekOfYear(parseDate(shift[1])); // Use the shift's start date for the week
+
+            // Sum up session durations
+            int totalSessionDuration = 0;
+            for (String[] session : sessions) {
+                totalSessionDuration += Integer.parseInt(session[2]); // Session duration in minutes
+            }
+
+            weeklyTime.put(week, weeklyTime.getOrDefault(week, 0) + totalSessionDuration);
+        }
+
+        return weeklyTime;
+    }
+
 
     private Map<String, Integer> calculateWeeklyTime(List<String[]> records) {
         Map<String, Integer> weeklyTime = new HashMap<>();
@@ -134,26 +210,28 @@ public class StatisticFragment extends Fragment {
         dummyUsers.add(new String[]{"2", "Bob"});
         dummyUsers.add(new String[]{"3", "Charlie"});
 
-        // Dummy Shifts: {userId, date, durationInMinutes}
         dummyShifts = new ArrayList<>();
-        dummyShifts.add(new String[]{"1", "2025-01-01", "240"});
-        dummyShifts.add(new String[]{"1", "2025-01-05", "300"});
-        dummyShifts.add(new String[]{"1", "2025-01-08", "360"});
-        dummyShifts.add(new String[]{"2", "2025-01-01", "180"});
-        dummyShifts.add(new String[]{"2", "2025-01-15", "540"});
-        dummyShifts.add(new String[]{"3", "2025-01-01", "420"});
-        dummyShifts.add(new String[]{"3", "2025-01-09", "240"});
-        dummyShifts.add(new String[]{"3", "2025-01-17", "300"});
+        dummyShifts.add(new String[]{"1", "2025-01-01T08:00:00", "2025-01-01T16:00:00"}); // Shift 1: 8 AM - 4 PM
+        dummyShifts.add(new String[]{"1", "2025-01-11T09:00:00", "2025-01-02T17:00:00"}); // Shift 2: 9 AM - 5 PM
+        dummyShifts.add(new String[]{"2", "2025-01-01T07:00:00", "2025-01-01T15:00:00"}); // Shift 1: 7 AM - 3 PM
 
-        // Dummy Sessions: {userId, date, durationInMinutes}
+        // Dummy Sessions: {userId, startTimestamp, durationInMinutes}
         dummySessions = new ArrayList<>();
-        dummySessions.add(new String[]{"1", "2025-01-01", "200"});
-        dummySessions.add(new String[]{"1", "2025-01-05", "290"});
-        dummySessions.add(new String[]{"1", "2025-01-09", "350"});
-        dummySessions.add(new String[]{"2", "2025-01-01", "150"});
-        dummySessions.add(new String[]{"2", "2025-01-15", "480"});
-        dummySessions.add(new String[]{"3", "2025-01-01", "400"});
-        dummySessions.add(new String[]{"3", "2025-01-10", "220"});
-        dummySessions.add(new String[]{"3", "2025-01-16", "290"});
+        dummySessions.add(new String[]{"1", "2025-01-01T09:00:00", "120"}); // Session 1: 9 AM - 11 AM
+        dummySessions.add(new String[]{"1", "2025-01-01T14:00:00", "90"});  // Session 2: 2 PM - 3:30 PM
+        dummySessions.add(new String[]{"1", "2025-01-02T10:30:00", "180"}); // Session 3: 10:30 AM - 1:30 PM
+        dummySessions.add(new String[]{"2", "2025-01-01T08:30:00", "150"}); // Session 1: 8:30 AM - 11:00 AM
+        dummySessions.add(new String[]{"2", "2025-01-01T13:00:00", "60"});  // Session 2: 1 PM - 2 PM
+    }
+
+    private Timestamp parseTimestamp(String dateString) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        try {
+            Date parsedDate = format.parse(dateString); // Parse the string into a Date object
+            return new Timestamp(parsedDate); // Create a Firebase Timestamp
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Handle parse error
+        }
     }
 }
