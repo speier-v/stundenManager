@@ -15,6 +15,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +40,9 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UserStatistic stat = statistics.get(position);
-
         holder.tvUserName.setText(stat.getUserName());
 
-        populateBarChart(holder.barChart, stat.getExpectedTimePerWeek(), stat.getActualTimePerWeek());
+        populateBarChart(holder.barChart, stat.getExpectedTimePerWeek(), stat.getActualTimePerWeek(), stat.getShiftDateLabels());
     }
 
     @Override
@@ -50,10 +50,11 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.View
         return statistics.size();
     }
 
-    private void populateBarChart(BarChart barChart, Map<String, Integer> expected, Map<String, Integer> actual) {
+    private void populateBarChart(BarChart barChart, Map<String, Integer> expected, Map<String, Integer> actual, List<String> shiftDateLabels) {
         List<BarEntry> expectedEntries = new ArrayList<>();
         List<BarEntry> actualEntries = new ArrayList<>();
         final List<String> weeks = new ArrayList<>(expected.keySet());
+        List<String> labels = shiftDateLabels;
 
         for (int i = 0; i < weeks.size(); i++) {
             String week = weeks.get(i);
@@ -72,13 +73,7 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.View
 
         // Configure X-Axis
         XAxis xAxis = barChart.getXAxis();
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int index = (int) value;
-                return index >= 0 && index < weeks.size() ? weeks.get(index) : "";
-            }
-        });
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 

@@ -81,11 +81,34 @@ public class StatisticFragment extends Fragment {
             Map<String, Integer> expectedTimePerWeek = calculateWeeklyTimeForShifts(userShifts);
             Map<String, Integer> actualTimePerWeek = calculateWeeklyTimeForSessions(shiftToSessionsMap);
 
+            // Ensure all weeks are aligned
+            alignWeeklyTimes(expectedTimePerWeek, actualTimePerWeek);
+
+            // Prepare date labels
+            List<String> shiftDateLabels = new ArrayList<>();
+            for (String[] shift : userShifts) {
+                String formattedDate = formatShiftDate(shift[1], shift[2]);
+                shiftDateLabels.add(formattedDate);
+            }
+
             // Add user statistic
-            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek));
+            statistics.add(new UserStatistic(userName, expectedTimePerWeek, actualTimePerWeek, shiftDateLabels));
         }
 
         return statistics;
+    }
+
+    private String formatShiftDate(String start, String end) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
+        try {
+            Date startDate = inputFormat.parse(start);
+            Date endDate = inputFormat.parse(end);
+            return outputFormat.format(startDate) + " - " + outputFormat.format(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "Invalid Date";
+        }
     }
 
     private Map<String[], List<String[]>> mapSessionsToShifts(List<String[]> shifts, List<String[]> sessions) {
@@ -143,18 +166,26 @@ public class StatisticFragment extends Fragment {
             List<String[]> sessions = entry.getValue();
             String week = getWeekOfYear(parseDate(shift[1])); // Use the shift's start date for the week
 
-            // Sum up session durations
+            // Calculate total session duration for this shift
             int totalSessionDuration = 0;
             for (String[] session : sessions) {
                 totalSessionDuration += Integer.parseInt(session[2]); // Session duration in minutes
             }
 
+            // Add the duration to the week's total
             weeklyTime.put(week, weeklyTime.getOrDefault(week, 0) + totalSessionDuration);
         }
 
         return weeklyTime;
     }
 
+    private void alignWeeklyTimes(Map<String, Integer> expectedTimePerWeek, Map<String, Integer> actualTimePerWeek) {
+        for (String week : expectedTimePerWeek.keySet()) {
+            if (!actualTimePerWeek.containsKey(week)) {
+                actualTimePerWeek.put(week, 0); // Set actual time to 0 for weeks without sessions
+            }
+        }
+    }
 
     private Map<String, Integer> calculateWeeklyTime(List<String[]> records) {
         Map<String, Integer> weeklyTime = new HashMap<>();
