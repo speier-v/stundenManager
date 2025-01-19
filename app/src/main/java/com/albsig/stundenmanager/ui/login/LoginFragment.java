@@ -35,10 +35,16 @@ public class LoginFragment extends Fragment {
     private FragmentTransaction fragmentTransaction;
     private Context mContext;
     private UserViewModel userViewModel;
+    private LoginListener loginListener;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        if (context instanceof LoginListener) {
+            loginListener = (LoginListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement LoginListener");
+        }
         mContext = context;
     }
 
@@ -87,6 +93,7 @@ public class LoginFragment extends Fragment {
             }
 
             Toast.makeText(mContext, "Login Successful", Toast.LENGTH_SHORT).show();
+            loginListener.onLoginSuccess(userModel.getUid());
             goToDashboard();
         });
     }
