@@ -1,6 +1,7 @@
 package com.albsig.stundenmanager.domain.repository;
 
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.domain.model.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.VIModel;
 
@@ -19,4 +20,6 @@ public interface AdminRepository {
     void getVIListToCheck(String uid, ResultCallback<List<VIModel>> resultCallback);
 
     void updateVIModel(String approvalType, String uid, String docId, ResultCallback<Boolean> resultCallback);
+
+    void getShifts(ResultCallback<List<ShiftModel>> resultCallback);
 }

@@ -9,11 +9,10 @@ import androidx.annotation.NonNull;
 import com.albsig.stundenmanager.common.Constants;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.domain.model.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.VIModel;
-import com.albsig.stundenmanager.domain.model.session.SessionModel;
 import com.albsig.stundenmanager.domain.repository.AdminRepository;
-import com.albsig.stundenmanager.domain.repository.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
@@ -234,6 +233,26 @@ public class AdminRepositoryImpl implements AdminRepository {
             }
 
             resultCallback.onSuccess(Result.success(true));
+        });
+    }
+
+    @Override
+    public void getShifts(ResultCallback<List<ShiftModel>> resultCallback) {
+        firebaseFirestore.collection(Constants.SHIFTS_COLLECTION).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                resultCallback.onError(Result.error(task.getException()));
+                return;
+            }
+
+            List<ShiftModel> shiftList = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                ShiftModel shiftModel = new ShiftModel(document);
+                assert shiftModel != null;
+                shiftModel.setDocumentId(document.getId());
+                shiftList.add(shiftModel);
+            }
+
+            resultCallback.onSuccess(Result.success(shiftList));
         });
     }
 }

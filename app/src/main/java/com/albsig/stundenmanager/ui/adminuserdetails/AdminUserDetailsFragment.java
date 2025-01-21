@@ -29,6 +29,7 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminUserDetailsBinding;
+import com.albsig.stundenmanager.domain.model.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.adminworkeradministration.AdminUserAdministrationFragment;
 import com.albsig.stundenmanager.ui.vacationillness.VIAdapter;
@@ -164,77 +165,74 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
         LocalDateTime localData = LocalDateTime.now();
         String todayDateStr = localData.getYear() + "_" + localData.getMonthValue() + "_" + localData.getDayOfMonth() + "-" + localData.getHour() + "_" + localData.getMinute();
         String fileName = "Report_" +userModel.getName() + "_" + userModel.getSurname() + todayDateStr + Constants.FILE_TYPE_PDF;
-        List<String> content = getContents(localData);
+        adminViewModel.getContents(localData, userModel, 2025, new ResultCallback<List<String>>() {
+            @Override
+            public void onSuccess(Result<List<String>> content) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                    values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+                    //put in Downloads folder
+                    values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-            //put in Downloads folder
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/");
+                    Uri uri = requireActivity().getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
+                    try (OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(uri)) {
+                        if (outputStream != null) {
+                            // PDF erstellen
+                            PdfDocument document = new PdfDocument();
+                            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
 
-            Uri uri = requireActivity().getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
-            try (OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(uri)) {
-                if (outputStream != null) {
-                    // create PDF
-                    PdfDocument document = new PdfDocument();
-                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
-                    PdfDocument.Page page = document.startPage(pageInfo);
-                    addTitle(page);
-                    //add content to PDF
-                    Paint paint = new Paint();
-                    paint.setTextSize(10);
-                    paint.setColor(Color.BLACK);
+                            // Einstellungen
+                            Paint paint = new Paint();
+                            paint.setTextSize(10);
+                            paint.setColor(Color.BLACK);
 
-                    float x = 10;
-                    float y = 50;
-                    for (String line : content) {
-                        page.getCanvas().drawText(line, x, y, paint);
-                        y += 20;
+                            float x = 10; // Startposition X
+                            float y = 50; // Startposition Y
+                            float lineHeight = 20; // Höhe einer Zeile
+                            float pageHeight = 600; // Gesamthöhe der Seite
+                            float bottomMargin = 50; // Unterer Rand
+                            int linesPerPage = (int) ((pageHeight - bottomMargin) / lineHeight); // Zeilen pro Seite
+
+                            int lineCount = 0;
+                            PdfDocument.Page page = document.startPage(pageInfo);
+
+                            for (String line : content.getValue()) {
+                                // Neue Seite starten, wenn der Platz nicht mehr ausreicht
+                                if (lineCount > 0 && lineCount % linesPerPage == 0) {
+                                    document.finishPage(page);
+                                    pageInfo = new PdfDocument.PageInfo.Builder(300, 600, (lineCount / linesPerPage) + 1).create();
+                                    page = document.startPage(pageInfo);
+                                    y = 50; // Zurück zur Startposition
+                                }
+
+                                // Text auf der aktuellen Seite zeichnen
+                                page.getCanvas().drawText(line, x, y, paint);
+                                y += lineHeight;
+                                lineCount++;
+                            }
+
+                            // Letzte Seite beenden
+                            document.finishPage(page);
+
+                            // PDF schreiben und schließen
+                            document.writeTo(outputStream);
+                            document.close();
+
+                            Toast.makeText(mContext, "PDF gespeichert in Downloads", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(mContext, "Fehler beim Speichern der PDF", Toast.LENGTH_SHORT).show();
                     }
-
-                    document.finishPage(page);
-                    document.writeTo(outputStream);
-                    document.close();
-
-                    Toast.makeText(mContext, "PDF gespeichert in Downloads", Toast.LENGTH_SHORT).show();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(mContext, "Fehler beim Speichern der PDF", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            // Ältere Android-Versionen - direkter Zugriff
-            File downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File pdfFile = new File(downloadsFolder, fileName);
 
-            try (FileOutputStream fos = new FileOutputStream(pdfFile)) {
-                // PDF erzeugen
-                PdfDocument document = new PdfDocument();
-                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(350, 900, 1).create();
-                PdfDocument.Page page = document.startPage(pageInfo);
+            @Override
+            public void onError(Result<List<String>> error) {
 
-                Paint paint = new Paint();
-                paint.setTextSize(10);
-                paint.setColor(Color.BLACK);
-                float x = 10;
-                float y = 50;
-                for (String line : content) {
-                    page.getCanvas().drawText(line, x, y, paint);
-                    y += 20;
-                }
-
-                // PDF beenden und speichern
-                document.finishPage(page);
-                document.writeTo(fos);
-                document.close();
-
-                Toast.makeText(mContext, "PDF gespeichert in Downloads", Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(mContext, "Fehler beim Speichern der PDF", Toast.LENGTH_SHORT).show();
             }
-        }
+        });
     }
 
     private void addTitle(PdfDocument.Page page) {
@@ -242,28 +240,5 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
         paint.setTextSize(10);
         paint.setColor(Color.BLACK);
         page.getCanvas().drawText(Constants.APP_NAME, 12, 12, paint);
-    }
-
-    private List<String> getContents(LocalDateTime localData) {
-        List<String> lines = new ArrayList<>();
-        List<String> months = new ArrayList<>(
-                List.of("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember")
-        );
-
-        lines.add("Austtelungsdatum: " + localData.getYear() + "-" + localData.getMonthValue() + "-" + localData.getDayOfMonth());
-        lines.add("Name: " + userModel.getName());
-        lines.add("Vorname: " + userModel.getSurname());
-        lines.add("___________________________________");
-        lines.add("Zu leistende Arbeitsstunden (pro Monat) : 160");
-        lines.add("Zu leistende Arbeitsstunden (pro Woche) : 40");
-        lines.add("___________________________________");
-
-        for (String month : months) {
-            lines.add(month);
-            lines.add("___________________________________");
-        }
-
-
-        return lines;
     }
 }

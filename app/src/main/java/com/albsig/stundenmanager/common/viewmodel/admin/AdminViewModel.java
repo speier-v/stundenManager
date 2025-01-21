@@ -6,16 +6,32 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.albsig.stundenmanager.common.Constants;
+import com.albsig.stundenmanager.common.Helpers;
 import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
+import com.albsig.stundenmanager.domain.model.ShiftModel;
 import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.domain.model.VIModel;
 import com.albsig.stundenmanager.domain.repository.AdminRepository;
 import com.albsig.stundenmanager.domain.repository.UserRepository;
+import com.google.firebase.Timestamp;
 
 import org.json.JSONObject;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import kotlin.reflect.KCallable;
+import kotlinx.coroutines.internal.ContextScope;
 
 public class AdminViewModel extends ViewModel {
 
@@ -150,5 +166,110 @@ public class AdminViewModel extends ViewModel {
                 callback.onError(error);
             }
         });
+    }
+
+    public void getFilteredShiftsForUser(String uid, int year, ResultCallback<List<ShiftModel>> callback) {
+        String refUid = "/" + Constants.USERS_COLLECTION + "/" + uid;
+        adminRepository.getShifts(new ResultCallback<List<ShiftModel>>() {
+            @Override
+            public void onSuccess(Result<List<ShiftModel>> response) {
+                List<ShiftModel> filteredUserShifts = response.getValue();
+                filteredUserShifts = filterForYear(filteredUserShifts, year);
+                filteredUserShifts = filterForUser(filteredUserShifts, refUid);
+                callback.onSuccess(Result.success(filteredUserShifts));
+            }
+
+            @Override
+            public void onError(Result<List<ShiftModel>> error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    private List<ShiftModel> filterForYear(List<ShiftModel> filteredUserShifts, int year) {
+        List<ShiftModel> res = new ArrayList<>();
+        Timestamp startDate = Helpers.createCustomTimestamp(year, 1, 1, 0, 0);
+        Timestamp endDate = Helpers.createCustomTimestamp(year, 12, 31, 23, 59);
+
+        for (ShiftModel shift : filteredUserShifts) {
+            long startDiff = shift.getStartDate().toDate().getTime() - startDate.toDate().getTime();
+            long endDiff = endDate.toDate().getTime() - shift.getEndDate().toDate().getTime();
+
+            if ( startDiff > 0  && endDiff > 0) {
+                res.add(shift);
+            }
+        }
+
+        return res;
+    }
+
+    private List<ShiftModel> filterForUser(List<ShiftModel> filteredUserShifts, String refUid) {
+        List<ShiftModel> res = new ArrayList<>();
+        for (ShiftModel shift : filteredUserShifts) {
+            if(shift.getMorningShift().contains(refUid)) {
+                res.add(shift);
+            } else if(shift.getAfternoonShift().contains(refUid)) {
+                res.add(shift);
+            } else if(shift.getEveningShift().contains(refUid)) {
+                res.add(shift);
+            }
+        }
+
+        return res;
+    }
+
+    public void getContents(LocalDateTime localData, UserModel userModel,int year, ResultCallback<List<String>> callback) {
+        List<String> lines = new ArrayList<>();
+
+        getFilteredShiftsForUser(userModel.getUid(), year, new ResultCallback<List<ShiftModel>>() {
+            @Override
+            public void onSuccess(Result<List<ShiftModel>> response) {
+                List<ShiftModel> filteredUserShifts = response.getValue();
+                Map<Month, Integer> monthlyCounts = getMonthlyCounts(filteredUserShifts, year);
+
+                lines.add("Austtelungsdatum: " + localData.getYear() + "-" + localData.getMonthValue() + "-" + localData.getDayOfMonth());
+                lines.add("Name: " + userModel.getName());
+                lines.add("Vorname: " + userModel.getSurname());
+                lines.add(addUnderlineBreak());
+                lines.add("Zu leistende Arbeitsstunden (pro Monat) : 160");
+                lines.add("Zu leistende Arbeitsstunden (pro Woche) : 40");
+                lines.add(addUnderlineBreak());
+                for (Month month : Month.values()) {
+                    lines.add(month.getDisplayName(TextStyle.FULL, Locale.GERMAN));
+                    lines.add("Geleistete Arbeitszeit (in Stunden): " + monthlyCounts.get(month));
+                    lines.add("Urlaube (in Stunden): " + 0);
+                    lines.add("Krankheiten (in Stunden): " + 0 );
+                    lines.add("Gesamt (in Stunden): " + 0);
+                    lines.add(addUnderlineBreak());
+                }
+
+                callback.onSuccess(Result.success(lines));
+            }
+
+            @Override
+            public void onError(Result<List<ShiftModel>> error) {
+
+            }
+        });
+    }
+
+    private Map<Month, Integer> getMonthlyCounts(List<ShiftModel> shifts, int year) {
+        Map<Month, Integer> monthlyCounts = new HashMap<>();
+        for (Month month : Month.values()) {
+            monthlyCounts.put(month, 0);
+        }
+
+
+        for(ShiftModel shiftModel : shifts) {
+            LocalDate shiftStartDate = shiftModel.getStartDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            shiftStartDate.getMonth();
+            monthlyCounts.put(shiftStartDate.getMonth(), monthlyCounts.getOrDefault(shiftStartDate.getMonth(), 0) + 40);
+        }
+
+        return monthlyCounts;
+    }
+
+    private String addUnderlineBreak() {
+        return "___________________________________";
     }
 }
