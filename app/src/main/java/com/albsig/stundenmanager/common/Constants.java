@@ -14,6 +14,8 @@ public class Constants {
     public static final String TAG_WORKER_ADMINISTRATION = "WorkerAdministration";
     public static final String TAG_USER_DETAILS = "UserDetails";
     public static final String FIELD_APPROVAL = "approval";
+    public static final String APP_NAME = "Studentenmanager";
+    public static final String FILE_TYPE_PDF = ".pdf";
     public static String TAG_ADMIN_DASHBOARD = "AdminDashboard";
 
     public static final String USER_MODEL_ID = "uid";

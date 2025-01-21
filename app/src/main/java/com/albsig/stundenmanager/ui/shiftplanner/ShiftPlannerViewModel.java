@@ -186,6 +186,9 @@ public class ShiftPlannerViewModel extends ViewModel {
         Timestamp tmpStartDate = Helpers.createCustomTimestamp(startDate.getYear(), startDate.getMonth().getValue(), startDate.getDayOfMonth(), startDate.getHour(), startDate.getMinute());
         Timestamp tmpEndDate = Helpers.createCustomTimestamp(endDate.getYear(), endDate.getMonth().getValue(), endDate.getDayOfMonth(), endDate.getHour(), endDate.getMinute());
 
+        Log.d(TAG, "Start date: " + tmpStartDate.toDate().toString());
+        Log.d(TAG, "End date: " + tmpEndDate.toDate().toString());
+
         JSONObject shiftData = new JSONObject(
                 Map.of(
                         "startDate", tmpStartDate.toDate().getTime(),

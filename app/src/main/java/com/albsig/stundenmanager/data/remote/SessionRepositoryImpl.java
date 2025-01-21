@@ -76,6 +76,9 @@ public class SessionRepositoryImpl implements SessionRepository {
 
     @Override
     public void removeSessionsSnapshotListener() {
+        if (sessionsSnapshotListener == null) {
+            return;
+        }
         sessionsSnapshotListener.remove();
         sessionsSnapshotListener = null;
     }

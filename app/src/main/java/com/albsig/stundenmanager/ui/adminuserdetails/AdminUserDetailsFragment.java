@@ -1,7 +1,15 @@
 package com.albsig.stundenmanager.ui.adminuserdetails;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +29,19 @@ import com.albsig.stundenmanager.common.callbacks.Result;
 import com.albsig.stundenmanager.common.callbacks.ResultCallback;
 import com.albsig.stundenmanager.common.viewmodel.admin.AdminViewModel;
 import com.albsig.stundenmanager.databinding.FragmentAdminUserDetailsBinding;
+import com.albsig.stundenmanager.domain.model.ShiftModel;
+import com.albsig.stundenmanager.domain.model.UserModel;
 import com.albsig.stundenmanager.ui.adminworkeradministration.AdminUserAdministrationFragment;
 import com.albsig.stundenmanager.ui.vacationillness.VIAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapter.OnUserApprovalClickListener {
 
@@ -35,6 +53,7 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
     RecyclerView rvVI;
     VIAdapter viAdapter;
     ApprovalAdapter approvalAdapter;
+    UserModel userModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,6 +82,13 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
         initObserver();
         initRecyclerVI();
         initRecyclerApproval();
+        initCreateReportBtn();
+    }
+
+    private void initCreateReportBtn() {
+        binding.btnCreateReport.setOnClickListener(view -> {
+            savePdfToDownloads();
+        });
     }
 
     private void initRecyclerApproval() {
@@ -89,6 +115,7 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
             binding.tvSurname.setText(userModel.getSurname());
             adminViewModel.getCheckedVIList(userModel.getUid());
             adminViewModel.getVIListToCheck(userModel.getUid());
+            this.userModel = userModel;
         });
 
         adminViewModel.getCheckedVIList().observe(getViewLifecycleOwner(), result -> {
@@ -132,5 +159,77 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
                 Toast.makeText(mContext, "Update failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void savePdfToDownloads() {
+        LocalDateTime localData = LocalDateTime.now();
+        String todayDateStr = localData.getYear() + "_" + localData.getMonthValue() + "_" + localData.getDayOfMonth() + "-" + localData.getHour() + "_" + localData.getMinute();
+        String fileName = "Report_" +userModel.getName() + "_" + userModel.getSurname() + todayDateStr + Constants.FILE_TYPE_PDF;
+        adminViewModel.getContents(localData, userModel, 2025, new ResultCallback<List<String>>() {
+            @Override
+            public void onSuccess(Result<List<String>> content) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                    values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+                    values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/");
+
+                    Uri uri = requireActivity().getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
+                    try (OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(uri)) {
+                        if (outputStream != null) {
+                            PdfDocument document = new PdfDocument();
+                            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
+                            Paint paint = new Paint();
+                            paint.setTextSize(10);
+                            paint.setColor(Color.BLACK);
+
+                            float x = 10;
+                            float y = 50;
+                            float lineHeight = 20;
+                            float pageHeight = 600;
+                            float bottomMargin = 50;
+                            int linesPerPage = (int) ((pageHeight - bottomMargin) / lineHeight);
+
+                            int lineCount = 0;
+                            PdfDocument.Page page = document.startPage(pageInfo);
+
+                            for (String line : content.getValue()) {
+                                if (lineCount > 0 && lineCount % linesPerPage == 0) {
+                                    document.finishPage(page);
+                                    pageInfo = new PdfDocument.PageInfo.Builder(300, 600, (lineCount / linesPerPage) + 1).create();
+                                    page = document.startPage(pageInfo);
+                                    y = 50;
+                                }
+                                page.getCanvas().drawText(line, x, y, paint);
+                                y += lineHeight;
+                                lineCount++;
+                            }
+
+                            document.finishPage(page);
+
+                            document.writeTo(outputStream);
+                            document.close();
+
+                            Toast.makeText(mContext, "PDF gespeichert in Downloads", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(mContext, "Fehler beim Speichern der PDF", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Result<List<String>> error) {
+
+            }
+        });
+    }
+
+    private void addTitle(PdfDocument.Page page) {
+        Paint paint = new Paint();
+        paint.setTextSize(10);
+        paint.setColor(Color.BLACK);
+        page.getCanvas().drawText(Constants.APP_NAME, 12, 12, paint);
     }
 }
