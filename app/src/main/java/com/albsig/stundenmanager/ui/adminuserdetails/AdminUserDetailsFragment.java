@@ -172,50 +172,41 @@ public class AdminUserDetailsFragment extends Fragment implements ApprovalAdapte
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                     values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-                    //put in Downloads folder
                     values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/");
 
                     Uri uri = requireActivity().getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
                     try (OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(uri)) {
                         if (outputStream != null) {
-                            // PDF erstellen
                             PdfDocument document = new PdfDocument();
                             PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
-
-                            // Einstellungen
                             Paint paint = new Paint();
                             paint.setTextSize(10);
                             paint.setColor(Color.BLACK);
 
-                            float x = 10; // Startposition X
-                            float y = 50; // Startposition Y
-                            float lineHeight = 20; // Höhe einer Zeile
-                            float pageHeight = 600; // Gesamthöhe der Seite
-                            float bottomMargin = 50; // Unterer Rand
-                            int linesPerPage = (int) ((pageHeight - bottomMargin) / lineHeight); // Zeilen pro Seite
+                            float x = 10;
+                            float y = 50;
+                            float lineHeight = 20;
+                            float pageHeight = 600;
+                            float bottomMargin = 50;
+                            int linesPerPage = (int) ((pageHeight - bottomMargin) / lineHeight);
 
                             int lineCount = 0;
                             PdfDocument.Page page = document.startPage(pageInfo);
 
                             for (String line : content.getValue()) {
-                                // Neue Seite starten, wenn der Platz nicht mehr ausreicht
                                 if (lineCount > 0 && lineCount % linesPerPage == 0) {
                                     document.finishPage(page);
                                     pageInfo = new PdfDocument.PageInfo.Builder(300, 600, (lineCount / linesPerPage) + 1).create();
                                     page = document.startPage(pageInfo);
-                                    y = 50; // Zurück zur Startposition
+                                    y = 50;
                                 }
-
-                                // Text auf der aktuellen Seite zeichnen
                                 page.getCanvas().drawText(line, x, y, paint);
                                 y += lineHeight;
                                 lineCount++;
                             }
 
-                            // Letzte Seite beenden
                             document.finishPage(page);
 
-                            // PDF schreiben und schließen
                             document.writeTo(outputStream);
                             document.close();
 
