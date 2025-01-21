@@ -24,14 +24,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import kotlin.reflect.KCallable;
-import kotlinx.coroutines.internal.ContextScope;
 
 public class AdminViewModel extends ViewModel {
 
@@ -174,8 +172,8 @@ public class AdminViewModel extends ViewModel {
             @Override
             public void onSuccess(Result<List<ShiftModel>> response) {
                 List<ShiftModel> filteredUserShifts = response.getValue();
-                filteredUserShifts = filterForYear(filteredUserShifts, year);
-                filteredUserShifts = filterForUser(filteredUserShifts, refUid);
+                filteredUserShifts = filterForYearShifts(filteredUserShifts, year);
+                filteredUserShifts = filterForUserShifts(filteredUserShifts, refUid);
                 callback.onSuccess(Result.success(filteredUserShifts));
             }
 
@@ -186,7 +184,7 @@ public class AdminViewModel extends ViewModel {
         });
     }
 
-    private List<ShiftModel> filterForYear(List<ShiftModel> filteredUserShifts, int year) {
+    private List<ShiftModel> filterForYearShifts(List<ShiftModel> filteredUserShifts, int year) {
         List<ShiftModel> res = new ArrayList<>();
         Timestamp startDate = Helpers.createCustomTimestamp(year, 1, 1, 0, 0);
         Timestamp endDate = Helpers.createCustomTimestamp(year, 12, 31, 23, 59);
@@ -203,7 +201,7 @@ public class AdminViewModel extends ViewModel {
         return res;
     }
 
-    private List<ShiftModel> filterForUser(List<ShiftModel> filteredUserShifts, String refUid) {
+    private List<ShiftModel> filterForUserShifts(List<ShiftModel> filteredUserShifts, String refUid) {
         List<ShiftModel> res = new ArrayList<>();
         for (ShiftModel shift : filteredUserShifts) {
             if(shift.getMorningShift().contains(refUid)) {
@@ -218,32 +216,31 @@ public class AdminViewModel extends ViewModel {
         return res;
     }
 
-    public void getContents(LocalDateTime localData, UserModel userModel,int year, ResultCallback<List<String>> callback) {
-        List<String> lines = new ArrayList<>();
-
+    public void getContents(LocalDateTime localDateTime, UserModel userModel,int year, ResultCallback<List<String>> callback) {
         getFilteredShiftsForUser(userModel.getUid(), year, new ResultCallback<List<ShiftModel>>() {
             @Override
             public void onSuccess(Result<List<ShiftModel>> response) {
                 List<ShiftModel> filteredUserShifts = response.getValue();
+                filteredUserShifts = filterForYearShifts(filteredUserShifts, year);
+                filteredUserShifts = filterForUserShifts(filteredUserShifts, "/" + Constants.USERS_COLLECTION + "/" + userModel.getUid());
                 Map<Month, Integer> monthlyCounts = getMonthlyCounts(filteredUserShifts, year);
 
-                lines.add("Austtelungsdatum: " + localData.getYear() + "-" + localData.getMonthValue() + "-" + localData.getDayOfMonth());
-                lines.add("Name: " + userModel.getName());
-                lines.add("Vorname: " + userModel.getSurname());
-                lines.add(addUnderlineBreak());
-                lines.add("Zu leistende Arbeitsstunden (pro Monat) : 160");
-                lines.add("Zu leistende Arbeitsstunden (pro Woche) : 40");
-                lines.add(addUnderlineBreak());
-                for (Month month : Month.values()) {
-                    lines.add(month.getDisplayName(TextStyle.FULL, Locale.GERMAN));
-                    lines.add("Geleistete Arbeitszeit (in Stunden): " + monthlyCounts.get(month));
-                    lines.add("Urlaube (in Stunden): " + 0);
-                    lines.add("Krankheiten (in Stunden): " + 0 );
-                    lines.add("Gesamt (in Stunden): " + 0);
-                    lines.add(addUnderlineBreak());
-                }
+                adminRepository.getCheckedVIList(userModel.getUid(), new ResultCallback<List<VIModel>>() {
+                    @Override
+                    public void onSuccess(Result<List<VIModel>> response) {
+                        List<VIModel> viList = response.getValue();
+                        Map<Month, Integer> monthlyVacation = getMonthlyVacations(viList, year);
+                        Map<Month, Integer> monthlyIllness = getMonthlyIllness(viList, year);
 
-                callback.onSuccess(Result.success(lines));
+                        List<String> lines = getContentLines(localDateTime, userModel, monthlyCounts, monthlyVacation, monthlyIllness);
+                        callback.onSuccess(Result.success(lines));
+                    }
+
+                    @Override
+                    public void onError(Result<List<VIModel>> error) {
+                        Log.d(TAG, "getCheckedVIList failed " + error.getError().toString());
+                    }
+                });
             }
 
             @Override
@@ -251,6 +248,108 @@ public class AdminViewModel extends ViewModel {
 
             }
         });
+    }
+
+    private Map<Month, Integer> getMonthlyVacations(List<VIModel> viList, int year) {
+        List<VIModel> filteredVacationList = new ArrayList<>();
+        filteredVacationList = filterForType(Constants.VACATION_COLLECTION, viList);
+        filteredVacationList = filterForYearVI(filteredVacationList, year);
+
+        Map<Month, Integer> monthlyVacation = new HashMap<>();
+
+        for (VIModel viModel : filteredVacationList) {
+            LocalDate viStartDate = viModel.getStartDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            LocalDate viEndDate = viModel.getEndDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            long daysBetween = ChronoUnit.DAYS.between(viStartDate, viEndDate) + 1;
+            long workdays = filterForWorkdays(viStartDate, viEndDate);
+
+            int hoursBetween = (int) (workdays * 8);
+            monthlyVacation.put(viStartDate.getMonth(), (int) (monthlyVacation.getOrDefault(viStartDate.getMonth(), 0) + hoursBetween));
+        }
+        return monthlyVacation;
+    }
+
+    private long filterForWorkdays(LocalDate viStartDate, LocalDate viEndDate) {
+        long workdays = 0;
+        for (LocalDate date = viStartDate; !date.isAfter(viEndDate); date = date.plusDays(1)) {
+            if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                workdays++;
+            }
+        }
+        return workdays;
+    }
+
+    private List<VIModel> filterForYearVI(List<VIModel> filteredVIList, int year) {
+        List<VIModel> res = new ArrayList<>();
+        LocalDate relativeDate = LocalDate.of(year, 1, 1);
+
+        for (VIModel viModel : filteredVIList) {
+            LocalDate viStartDate = viModel.getStartDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            LocalDate viEndDate = viModel.getEndDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            if(relativeDate.getYear() == viStartDate.getYear() || relativeDate.getYear() == viEndDate.getYear()) {
+                res.add(viModel);
+            }
+        }
+
+        return  res;
+    }
+
+    private List<VIModel> filterForType(String type, List<VIModel> viList) {
+        List<VIModel> res = new ArrayList<>();
+        for (VIModel viModel : viList) {
+            if (viModel.getType().equals(type)) {
+                res.add(viModel);
+            }
+        }
+
+        return res;
+    }
+
+    private Map<Month, Integer> getMonthlyIllness(List<VIModel> viList, int year) {
+        List<VIModel> filteredIllnessList = new ArrayList<>();
+        filteredIllnessList = filterForType(Constants.ILLNESS_COLLECTION, viList);
+        filteredIllnessList = filterForYearVI(filteredIllnessList, year);
+
+        Map<Month, Integer> monthlyIllness = new HashMap<>();
+
+        for (VIModel viModel : filteredIllnessList) {
+            LocalDate viStartDate = viModel.getStartDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            LocalDate viEndDate = viModel.getEndDate().toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            long daysBetween = ChronoUnit.DAYS.between(viStartDate, viEndDate) + 1;
+            long workdays = filterForWorkdays(viStartDate, viEndDate);
+
+            int hoursBetween = (int) (workdays * 8);
+            monthlyIllness.put(viStartDate.getMonth(), (int) (monthlyIllness.getOrDefault(viStartDate.getMonth(), 0) + hoursBetween));
+        }
+        return monthlyIllness;
+    }
+
+    private List<String> getContentLines(LocalDateTime localData, UserModel userModel, Map<Month, Integer> monthlyCounts, Map<Month, Integer> monthlyVacation, Map<Month, Integer> monthlyIllness) {
+        List<String> lines = new ArrayList<>();
+        lines.add(Constants.APP_NAME);
+        lines.add(addUnderlineBreak());
+        lines.add("Austtelungsdatum: " + localData.getYear() + "-" + localData.getMonthValue() + "-" + localData.getDayOfMonth());
+        lines.add("Name: " + userModel.getName());
+        lines.add("Vorname: " + userModel.getSurname());
+        lines.add(addUnderlineBreak());
+        lines.add("Zu leistende Arbeitsstunden (pro Monat) : 160");
+        lines.add("Zu leistende Arbeitsstunden (pro Woche) : 40");
+        lines.add(addUnderlineBreak());
+        for (Month month : Month.values()) {
+            int valCounts = monthlyCounts.getOrDefault(month, 0);
+            int valVacation = monthlyVacation.getOrDefault(month, 0);
+            int valIllness = monthlyIllness.getOrDefault(month, 0);
+            int valTotal = valCounts - valVacation - valIllness;
+            lines.add(month.getDisplayName(TextStyle.FULL, Locale.GERMAN));
+            lines.add("Geleistete Arbeitszeit (in Stunden): " + valCounts);
+            lines.add("Urlaube (in Stunden): " + valVacation);
+            lines.add("Krankheiten (in Stunden): " + valIllness);
+            lines.add("Gesamt (in Stunden): " + valTotal);
+            lines.add(addUnderlineBreak());
+        }
+
+
+        return lines;
     }
 
     private Map<Month, Integer> getMonthlyCounts(List<ShiftModel> shifts, int year) {
